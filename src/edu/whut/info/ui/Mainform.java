@@ -92,16 +92,20 @@ public class Mainform {
     private JTextField txtbctlamda;
     private JButton showReultButton;
     private JLabel cltLengtxt;
+    private JPanel BCLT;
+    private JTextField BCLTLengtxt;
+    private JTextField BCLTpvaluetxt;
     private Logger m_log;
 
     public Mainform() {
         Date date = new Date();
         SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");
-        String filename = String.format(".%sResult_%s.log", File.separator, df.format(date));
+        //String filename = String.format(".%sResult_%s.log", File.separator, df.format(date));
+        String filename = String.format("Result_%s.log", df.format(date));
         String path = String.format(".%sResult", File.separator);
         BioLogger log = new BioLogger(path, filename);
         m_log = Logger.getLogger("segment");
-        m_frame = new JFrame("ToolSEG");
+        m_frame = new JFrame("ToolSEG 1.1");
         cltsteptxt.setText("8");
         cltlengthtxt.setText("256");
         cbsLengthtxt.setText("256");
@@ -124,12 +128,20 @@ public class Mainform {
         maxItertxt.setText("20");
         center.setText("8");
         gama.setText("20");
+
+        //BCLT params
+        BCLTLengtxt.setText("200");
+        BCLTpvaluetxt.setText("0.05");
+
+
 //        segmentlengthtxt.setText("20000,4000,500,10000,5000");
 //        cnvaluetxt.setText("1,2,1,2,3");
 //        variancetxt.setText("0.2,0.2,0.3,0.3,0.2");
         cnvaluetxt.setText("1,3,2,4");
         variancetxt.setText("0.4,0.4,0.4,0.4");
         segmentlengthtxt.setText("300,300,300,300");
+
+
         System.out.println();
         btnSegment.setEnabled(false);
         btnSegment.setToolTipText("before segment you need generate data or choose input file");
@@ -209,6 +221,11 @@ public class Mainform {
                     case 5:
                         gamap = Double.valueOf(pgamatxt.getText());
                         cutterAlgorithm = new PCFSegment(gamap);
+                        break;
+                    case 6:
+                        length = Integer.valueOf(BCLTLengtxt.getText());
+                        p = Double.valueOf(BCLTpvaluetxt.getText());
+                        cutterAlgorithm = new BCLT(p, length);
                         break;
                 }
                 myCore.CnSegment.cutter = cutterAlgorithm;

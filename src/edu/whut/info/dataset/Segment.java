@@ -12,26 +12,31 @@ import java.io.Serializable;
  */
 public class Segment implements Comparable<Segment>, Serializable {
     private static final long serialVersionUID = 4905497107751450036L;
-    public static int IDCounter = 0;
+    private static int IDCounter = 0;
     public int Seg_id;
     public short Chr_id;
 
     public GeneRange range;
     public boolean isReady;
     public boolean isDirty;
+    public int getStart(){
+        return  range.Start;
+    }
+
     public double HalfCopyNumber;
     public double stdHalfCopyNumber;
+
     public double purityCorrCopyNumber;
 
     public Segment() {
         isReady = false;
         isDirty = true;
         range = new GeneRange();
-        Seg_id = ++IDCounter;
+        Seg_id = ++IDCounter ;
     }
 
-    public int getStart() {
-        return range.Start;
+    public static void resetID(){
+        IDCounter = 0;
     }
 
     @Override
@@ -74,8 +79,7 @@ public class Segment implements Comparable<Segment>, Serializable {
         newSeg.setRange(start, stop);
         return newSeg;
     }
-
-    //    public Segment getSubSegment1(int start, int stop,double maxZ) {
+//    public Segment getSubSegment1(int start, int stop,double maxZ) {
 //        if (start == stop) {//调试用
 //            System.out.println("getSubSegment : Start == Stop!");
 //            System.exit(-1);

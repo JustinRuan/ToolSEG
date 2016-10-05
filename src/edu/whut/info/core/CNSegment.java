@@ -50,7 +50,7 @@ public class CNSegment {
             long t1 = System.currentTimeMillis();
             cutter.splitChromosome(cacheSample.get(i), result.get(i), chrIds.get(i));
             long t2 = System.currentTimeMillis();
-            System.out.print(t2 - t1);
+            System.out.println(t2 - t1);
 
         }
         drawProbeSets(chros, result);
