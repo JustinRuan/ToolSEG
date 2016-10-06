@@ -1,5 +1,6 @@
 package edu.whut.info.core;
 
+import com.google.common.primitives.Doubles;
 import edu.whut.info.dataset.Chromosome;
 import edu.whut.info.dataset.Segment;
 import edu.whut.info.util.BioToolbox;
@@ -24,6 +25,7 @@ public class CNSegment {
 
     public CNSegment() {
         result = new ArrayList<>();
+        m_log = Logger.getLogger("segment");
     }
 
     public List<Set<Segment>> getResult() {
@@ -34,15 +36,49 @@ public class CNSegment {
         this.cutter = cutter;
     }
 
-    public void splitChromosome(ArrayList<Chromosome> chros) {
+    public void preprocessing(ArrayList<Chromosome> chros, double ratio, int method) {
+        cacheSample = new ArrayList<double[]>();
+
+        for (int i = 0; i < chros.size(); i++) {
+            if (chros.get(i).probes.size() == 0)
+                continue;
+            List<Double> values = chros.get(i).probes;
+
+            double[] cnArray = Doubles.toArray(values);
+            if (ratio > 0){
+                cnArray = BioToolbox.limitFiltering(cnArray, ratio);
+            }
+
+            //transform
+            switch (method){
+                case 1:
+                    for (int j = 0; j < cnArray.length; j++) {
+                        cnArray[j] = BioToolbox.log2(cnArray[j]);
+                    }
+                    break;
+                case 2:
+                    for (int j = 0; j < cnArray.length; j++) {
+                        cnArray[j] = Math.pow(2,cnArray[j]);
+                    }
+                    break;
+                default:
+                    //do nothing;
+            }
+            cacheSample.add(cnArray);
+        }
+    }
+
+    public void splitChromosome(ArrayList<Chromosome> chros, double ratio, int method) {
         result.clear();
-        loading(chros);
+        //loading(chros);
+        preprocessing(chros, ratio, method);
+
         int nums = cacheSample.size();
         for (int i = 0; i < nums; i++) {
             result.add(new TreeSet<Segment>());
         }
-        Set<Segment> temp = new TreeSet<>();
-        // drawChromosome(chros.get(2),temp,30);
+//        Set<Segment> temp = new TreeSet<>();
+//        // drawChromosome(chros.get(2),temp,30);
         ArrayList<Short> chrIds = new ArrayList<>();
         for (int i = 0; i < nums; i++)
             chrIds.add(chros.get(i).chrId);
@@ -50,10 +86,10 @@ public class CNSegment {
             long t1 = System.currentTimeMillis();
             cutter.splitChromosome(cacheSample.get(i), result.get(i), chrIds.get(i));
             long t2 = System.currentTimeMillis();
-            System.out.println(t2 - t1);
 
+            m_log.info(String.format("Time = %d ms",t2 - t1));
         }
-        drawProbeSets(chros, result);
+        drawProbeSets(chros, result, method);
         //    cutter.splitChromosome(cacheSample.get(1),result.get(1),chrIds.get(1));
         // drawChromosome(chros.get(2),result.get(1),30);
     }
@@ -76,8 +112,8 @@ public class CNSegment {
                 Segment seg = new Segment();
                 seg.range.Start = segm.Start();
                 seg.range.End = segm.End();
-                seg.stdHalfCopyNumber = segm.stdHalfCopyNumber;
-                seg.HalfCopyNumber = segm.HalfCopyNumber;
+                seg.stdCopyNumber = segm.stdCopyNumber;
+                seg.CopyNumber = segm.CopyNumber;
                 chros.add(segm);
             }
             temp.add(chros);
@@ -104,76 +140,84 @@ public class CNSegment {
         return result.get(i);
     }
 
-    public String drawChromosome(Chromosome chro, Set<Segment> segments, int step) {
-        int maxLength = 0;
-        maxLength = chro.probes.size();
-        int estimatedLength = maxLength;
-        int width = (int) (1.15 * estimatedLength / step);
-        int height = 400;
-        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        Graphics2D g = (Graphics2D) image.getGraphics();
-        g.setColor(Color.WHITE);
-        g.fillRect(0, 0, width, height);
-        Stroke bs;
-        bs = new BasicStroke(2.0f);
-        g.setStroke(bs);
-        int x, sx;
-        Font f1 = new Font(null, Font.BOLD, 24);
-        Font f2 = new Font(null, Font.BOLD, 12);
-        x = 100;
-        sx = 100 * step;
-        g.setColor(Color.BLACK);
-        g.setFont(f1);
-        for (double cnValue : chro.probes) {
-            int y = calculateYPosition(0, cnValue);
-            g.setColor(Color.DARK_GRAY);
-            g.fillRect(x, y, 2, 2);
-            sx++;
-            x = sx / step;
-        }
-        x = 100;
-        sx = 100 * step;
-        if (segments.size() != 0)
-            for (Segment s : segments) {
-                double cnValue = s.HalfCopyNumber * 2;
-                //int y = calculateYPosition(index,s.robustMeanHalfCopyNumber);
-                int y2 = calculateYPosition(0, BioToolbox.log2(cnValue));
-                g.setColor(Color.RED);
-                int w = (int) (s.length() / step + 0.5);
-                g.drawLine(x, y2, x + w, y2);
-                g.setFont(f2);
-                int textPos = (w > 30) ? x + w / 2 : x;
-                g.drawString(String.format("[%.2f]", cnValue), textPos, y2 - 6);
-                sx = sx + s.length();
-                x = (int) ((sx / step) + 0.5);
-            }
-        String filename = "";
-        try {
-            Date date = new Date();
-            SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");
-            filename = String.format(".%1$sResult%1$sChromosome_%2$s.png", File.separator, df.format(date));
-            ImageIO.write(image, "PNG", new File(filename));
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return filename;
-    }
+//    public String drawChromosome(Chromosome chro, Set<Segment> segments, int step) {
+//        int maxLength = 0;
+//        maxLength = chro.probes.size();
+//        int estimatedLength = maxLength;
+//        int width = (int) (1.15 * estimatedLength / step);
+//        int height = 400;
+//        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+//        Graphics2D g = (Graphics2D) image.getGraphics();
+//        g.setColor(Color.WHITE);
+//        g.fillRect(0, 0, width, height);
+//        Stroke bs;
+//        bs = new BasicStroke(2.0f);
+//        g.setStroke(bs);
+//        int x, sx;
+//        Font f1 = new Font(null, Font.BOLD, 24);
+//        Font f2 = new Font(null, Font.BOLD, 12);
+//        x = 100;
+//        sx = 100 * step;
+//        g.setColor(Color.BLACK);
+//        g.setFont(f1);
+//        for (double cnValue : chro.probes) {
+//            int y = calculateYPosition(0, cnValue);
+//            g.setColor(Color.DARK_GRAY);
+//            g.fillRect(x, y, 2, 2);
+//            sx++;
+//            x = sx / step;
+//        }
+//        x = 100;
+//        sx = 100 * step;
+//        if (segments.size() != 0)
+//            for (Segment s : segments) {
+//                double cnValue = s.CopyNumber * 2;
+//                //int y = calculateYPosition(index,s.robustMeanHalfCopyNumber);
+//                int y2 = calculateYPosition(0, BioToolbox.log2(cnValue));
+//                g.setColor(Color.RED);
+//                int w = (int) (s.length() / step + 0.5);
+//                g.drawLine(x, y2, x + w, y2);
+//                g.setFont(f2);
+//                int textPos = (w > 30) ? x + w / 2 : x;
+//                g.drawString(String.format("[%.2f]", cnValue), textPos, y2 - 6);
+//                sx = sx + s.length();
+//                x = (int) ((sx / step) + 0.5);
+//            }
+//        String filename = "";
+//        try {
+//            Date date = new Date();
+//            SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");
+//            filename = String.format(".%1$sResult%1$sChromosome_%2$s.png", File.separator, df.format(date));
+//            ImageIO.write(image, "PNG", new File(filename));
+//        } catch (Exception ex) {
+//            ex.printStackTrace();
+//        }
+//        return filename;
+//    }
 
     private int calculateYPosition(int row, double value) {
         // return (int) (value * 50) + 400*(row - 1);
         return (int) (340 - value * 50) + 400 * row;
     }
 
-    public void drawProbeSets(ArrayList<Chromosome> chros, List<Set<Segment>> result) {
+    public void drawProbeSets(ArrayList<Chromosome> chros, List<Set<Segment>> result, int method) {
         if (chros.size() == 0)
             return;
-        int step = 10;
+
         int maxLength = 0;
         for (Chromosome chro : chros) {
             maxLength = Math.max(maxLength, chro.probes.size());
         }
-        int estimatedLength = maxLength;
-        int width = (int) (1.15 * estimatedLength / step);
+        int estimatedLength = (int)(1.15 * maxLength);
+
+        int step;
+        if (estimatedLength < 2000){
+            step = 1;
+        }else{
+            step = estimatedLength / 2000;
+        }
+
+        int width = (int) (estimatedLength / step);
         int height = 400 * result.size();
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = (Graphics2D) image.getGraphics();
@@ -181,7 +225,6 @@ public class CNSegment {
         g.fillRect(0, 0, width, height);
 
         Stroke bs;
-//        Stroke bs2;
         bs = new BasicStroke(2.0f);
 //        bs2 = new BasicStroke(1, BasicStroke.CAP_BUTT,
 //                BasicStroke.JOIN_BEVEL, 0,
@@ -209,9 +252,21 @@ public class CNSegment {
             x = 100;
             sx = 100 * step;
             for (Segment s : result.get(i)) {
-                double cnValue = s.HalfCopyNumber * 2;
-                //int y = calculateYPosition(index,s.robustMeanHalfCopyNumber);
-                int y2 = calculateYPosition(i, BioToolbox.log2(cnValue));
+                double cnValue;
+
+                //transform
+                switch (method){
+                    case 1:
+                        cnValue = Math.pow(2,s.CopyNumber);
+                        break;
+                    case 2:
+                        cnValue = BioToolbox.log2(s.CopyNumber);
+                        break;
+                    default:
+                        cnValue = s.CopyNumber;
+                }
+
+                int y2 = calculateYPosition(i, cnValue);
                 g.setColor(Color.RED);
                 int w = (int) (s.length() / step + 0.5);
                 g.drawLine(x, y2, x + w, y2);

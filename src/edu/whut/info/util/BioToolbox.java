@@ -672,5 +672,46 @@ public class BioToolbox {
         }
     }
 
+    public static double[] medianFiltering(double[] input,int width){
+        int size = width | 0x01;
+        int length = input.length;
+        double[] result = new double[length];
+        int halflen = size >> 1;
+
+        for (int i = 0; i < halflen; i++){
+            result[i] = input[i];
+            result[length - i - 1] = input[length - i - 1];
+        }
+
+        for (int i = halflen; i < length - halflen; i++){
+            double[] temp =  Arrays.copyOfRange(input, i - halflen, i + halflen);
+            Arrays.sort(temp);
+            result[i] = temp[halflen];
+        }
+
+        return result;
+    }
+    public static double[] limitFiltering(double[] input,double ratio){
+        int length = input.length;
+        double[] result = new double[length];
+
+        double temp[] = mean_std(input);
+        double up = temp[0] + ratio * temp[1];
+        double down = temp[0] - ratio * temp[1];
+
+        for (int i = 0; i < length; i++){
+            if (input[i] > up){
+                result[i] = up;
+            }else if (input[i] < down){
+                result[i] = down;
+            }else{
+                result[i] = input[i];
+            }
+        }
+        return result;
+    }
+
+
+
 }
 

@@ -58,8 +58,6 @@ public class Mainform {
     private JTextField txtOutputfile;
     private JButton input;
     private JCheckBox outliers;
-    private JCheckBox smoothing;
-    private JCheckBox potentialDetectionCheckBox;
     private JPanel potential;
     private JPanel MainPanel;
     private JPanel FastPCF;
@@ -95,7 +93,13 @@ public class Mainform {
     private JPanel BCLT;
     private JTextField BCLTLengtxt;
     private JTextField BCLTpvaluetxt;
+    private JTextField outliertxt;
+    private JRadioButton bypassRadioButton;
+    private JRadioButton log2RadioButton;
+    private JRadioButton power2RadioButton;
     private Logger m_log;
+
+    private int transformMethod;
 
     public Mainform() {
         Date date = new Date();
@@ -132,6 +136,9 @@ public class Mainform {
         //BCLT params
         BCLTLengtxt.setText("200");
         BCLTpvaluetxt.setText("0.05");
+
+        //preprocess
+        outliertxt.setText("2.5");
 
 
 //        segmentlengthtxt.setText("20000,4000,500,10000,5000");
@@ -228,10 +235,16 @@ public class Mainform {
                         cutterAlgorithm = new BCLT(p, length);
                         break;
                 }
+
+                double ratio = 0;
+                if (outliers.isSelected()) {
+                    ratio = Double.valueOf(outliertxt.getText());
+
+                }
                 myCore.CnSegment.cutter = cutterAlgorithm;
                 switch (workModel) {
                     case 0:
-                        myCore.CnSegment.splitChromosome(chros);
+                        myCore.CnSegment.splitChromosome(chros, ratio, transformMethod);
                         break;
                     case 1:
                         ArrayList<Chromosome> data1 = null;
@@ -299,11 +312,11 @@ public class Mainform {
                                     outputfileName.createNewFile(); // 创建新文件
                                     BufferedWriter out = new BufferedWriter(new FileWriter(outputfileName));
                                     out.write("chrId\t\t startLoci\t\t length\t\t CNmean\r\n");
-                                    myCore.CnSegment.splitChromosome(data);
+                                    myCore.CnSegment.splitChromosome(data, ratio, transformMethod);
                                     for (Set<Segment> segments : myCore.CnSegment.getResult())
                                         for (Segment seg : segments) {
                                             out.write(String.format("%2d\t\t %6d\t\t %6d\t\t %.4f\n",
-                                                    seg.Chr_id, seg.range.Start, seg.length(), seg.HalfCopyNumber));
+                                                    seg.Chr_id, seg.range.Start, seg.length(), seg.CopyNumber));
                                         }
                                     out.flush();
                                     out.close();
@@ -390,9 +403,16 @@ public class Mainform {
                     output.createNewFile(); //
                     BufferedWriter out = new BufferedWriter(new FileWriter(output));
                     out.write("Method\t\t numberOfSeg\t\t foundSeg\t\t Tolerance\t\t truePoint\t\t segTime\t\t \r\n");
+
+                    int width = 0;
+                    if (outliers.isSelected()) {
+                        width = Integer.valueOf(outliertxt.getText());
+
+                    }
+
                     for (SegmentCutter cutter : cutters) {
                         myCore.CnSegment.setCutter(cutter);
-                        myCore.CnSegment.splitChromosome(data);
+                        myCore.CnSegment.splitChromosome(data, width, transformMethod);
                         List<Set<Segment>> temp = myCore.CnSegment.resultclone();
                         // temp=myCore.CnSegment.getResult();
                         result.add(temp);
@@ -461,6 +481,24 @@ public class Mainform {
             @Override
             public void actionPerformed(ActionEvent e) {
                 chros.clear();
+            }
+        });
+        bypassRadioButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                transformMethod = 0;
+            }
+        });
+        log2RadioButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                transformMethod = 1;
+            }
+        });
+        power2RadioButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                transformMethod = 2;
             }
         });
     }
@@ -608,7 +646,7 @@ public class Mainform {
             sx = 100 * step;
 
             for (Segment s : result.get(i)) {
-                cnValue = s.HalfCopyNumber;
+                cnValue = s.CopyNumber;
                 int y2 = calculateYPosition(i, BioToolbox.log2(cnValue));
                 g.setColor(Color.RED);
                 int w = (int) (s.length() / step + 0.5);

@@ -103,8 +103,8 @@ public class FastPCF implements SegmentCutter {
         if (seg.isDirty) {
             double[] ms;
             ms = BioToolbox.robustMean(chromosome, seg.Start(), seg.End(), 16);
-            seg.HalfCopyNumber = ms[0];
-            seg.stdHalfCopyNumber = ms[1];
+            seg.CopyNumber = ms[0];
+            seg.stdCopyNumber = ms[1];
             seg.isDirty = false;
         }
     }

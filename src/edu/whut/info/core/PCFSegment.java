@@ -30,8 +30,8 @@ public class PCFSegment implements SegmentCutter {
         input.setChr_id(chrId);
         input.Seg_id = 0;
         double[] arr = BioToolbox.mean_std(data);
-        input.HalfCopyNumber = arr[0];
-        input.stdHalfCopyNumber = arr[1];
+        input.CopyNumber = arr[0];
+        input.stdCopyNumber = arr[1];
         input.setRange(0, data.length);
         chromosome = data;
         int IndexLength = data.length;
@@ -83,8 +83,8 @@ public class PCFSegment implements SegmentCutter {
         if (seg.isDirty) {
             double[] ms;
             ms = BioToolbox.robustMean(chromosome, seg.Start(), seg.End(), 16);
-            seg.HalfCopyNumber = ms[0];
-            seg.stdHalfCopyNumber = ms[1];
+            seg.CopyNumber = ms[0];
+            seg.stdCopyNumber = ms[1];
 
             seg.isDirty = false;
         }

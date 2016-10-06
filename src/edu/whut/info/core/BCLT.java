@@ -52,8 +52,8 @@ public class BCLT implements SegmentCutter {
         input.Seg_id = 1;//根节点
 
         double[] arr = BioToolbox.mean_std(data);
-        input.HalfCopyNumber = arr[0];
-        input.stdHalfCopyNumber = arr[1];
+        input.CopyNumber = arr[0];
+        input.stdCopyNumber = arr[1];
         input.setRange(0, data.length);
 
         LinkedBinaryTreeNode<Integer> root = zTree.setRoot(input);
@@ -189,7 +189,7 @@ public class BCLT implements SegmentCutter {
         zTree.setZValue(parent, maxZ);
         zTree.setBreakPosition(parent, maxPos, windowModel);
 
-        if (maxZ >= robustSTD && maxPos > 0) {
+        if (maxZ > robustSTD && maxPos > 0) {
             int newBreak = maxPos;
             //二分
             Segment front = input.getSubSegment(input.Start(), newBreak);
@@ -210,17 +210,15 @@ public class BCLT implements SegmentCutter {
     private void printZHistogram() {
 
         Histogram h = new Histogram(60, 0, 3);
-        Map<Integer, Double> zPos = new TreeMap<>();
         for (Map.Entry<Integer, Double> kv : zTree.zMap.entrySet()) {
             int id = kv.getKey();
             double z = kv.getValue();
             if (z > 0) {
                 h.addDataPoint(z);
-                zPos.put(zTree.breakPositions.get(id), z/robustSTD);
             }
         }
 
-        m_log.info(h.toString("z Value : robustSTD"));
+        m_log.info(h.toString("z Value"));
     }
 
     private void save2File(double[][] data, int length) {
@@ -260,7 +258,7 @@ public class BCLT implements SegmentCutter {
         sum = IntegralCN[stop] - IntegralCN[start];
 
         ///return Math.abs((sum - len*avgHalfCopyNumber)/(stdHalfCopyNumber*Math.sqrt(len)))
-        double cn = seg.HalfCopyNumber;
+        double cn = seg.CopyNumber;
 
         //double cc = (double) seg.length() * (seg.length() - 1);
 //        double cc = (double) len * (len - 1);
@@ -278,8 +276,8 @@ public class BCLT implements SegmentCutter {
 //            if (ms == null){
 //                System.out.println();
 //            }
-            seg.HalfCopyNumber = ms[0];
-            seg.stdHalfCopyNumber = ms[1];
+            seg.CopyNumber = ms[0];
+            seg.stdCopyNumber = ms[1];
 
             seg.isDirty = false;
         }

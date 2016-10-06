@@ -23,8 +23,8 @@ public class Segment implements Comparable<Segment>, Serializable {
         return  range.Start;
     }
 
-    public double HalfCopyNumber;
-    public double stdHalfCopyNumber;
+    public double CopyNumber;
+    public double stdCopyNumber;
 
     public double purityCorrCopyNumber;
 
@@ -93,7 +93,7 @@ public class Segment implements Comparable<Segment>, Serializable {
 //    }
     public String getCharacterString() {
         return String.format("Seg_id = % 6d : %02d;[% 6d - % 6d]\t Length =% 6d;\t robustAvg = %.4f \t robustStd = %.4f",
-                Seg_id, Chr_id, Start(), End(), length(), HalfCopyNumber, stdHalfCopyNumber);
+                Seg_id, Chr_id, Start(), End(), length(), CopyNumber, stdCopyNumber);
     }
 
 }

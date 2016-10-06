@@ -39,8 +39,8 @@ public class CLTSegment implements SegmentCutter {
         input.setChr_id(Chr_id);
         input.Seg_id = 0;
         double[] arr = BioToolbox.mean_std(data);
-        input.HalfCopyNumber = arr[0];
-        input.stdHalfCopyNumber = arr[1];
+        input.CopyNumber = arr[0];
+        input.stdCopyNumber = arr[1];
         input.setRange(0, data.length);
         splitChromosome(input, result);
         m_log.info(String.format("#### #### #### chr %02d First Step: Loci Count = %05d; \t Segments Count = %d",
@@ -70,7 +70,7 @@ public class CLTSegment implements SegmentCutter {
     private void splitChromosome(Segment input, Set<Segment> output) {
 
         if (chromosome.length == 0) return;
-        double[] arr = {input.HalfCopyNumber, input.stdHalfCopyNumber};
+        double[] arr = {input.CopyNumber, input.stdCopyNumber};
         double maxZ = 0;
         int Start = 0;
         int Stop = 0;
@@ -179,7 +179,7 @@ public class CLTSegment implements SegmentCutter {
             Segment nextSegment = it.next();
             refreshSegment(preSegment);
             refreshSegment(nextSegment);
-            if (Math.abs(preSegment.HalfCopyNumber - nextSegment.HalfCopyNumber) <= threshold || preSegment.length() < 20 || nextSegment.length() < 20) {
+            if (Math.abs(preSegment.CopyNumber - nextSegment.CopyNumber) <= threshold || preSegment.length() < 20 || nextSegment.length() < 20) {
                 preSegment.setRange(preSegment.Start(), nextSegment.End());
             } else {
                 temp.add(preSegment);
@@ -201,8 +201,8 @@ public class CLTSegment implements SegmentCutter {
         sum = IntegralCN[stop] - IntegralCN[start];
 
         ///return Math.abs((sum - len*avgHalfCopyNumber)/(stdHalfCopyNumber*Math.sqrt(len)))
-        double cn = seg.HalfCopyNumber;
-        double std = seg.stdHalfCopyNumber;
+        double cn = seg.CopyNumber;
+        double std = seg.stdCopyNumber;
 
         return Math.abs((sum - len * cn) / (std * Math.sqrt(len)));
     }
@@ -211,8 +211,8 @@ public class CLTSegment implements SegmentCutter {
         if (seg.isDirty) {
             double[] ms;
             ms = BioToolbox.robustMean(chromosome, seg.Start(), seg.End(), 16);
-            seg.HalfCopyNumber = ms[0];
-            seg.stdHalfCopyNumber = ms[1];
+            seg.CopyNumber = ms[0];
+            seg.stdCopyNumber = ms[1];
 
             seg.isDirty = false;
         }

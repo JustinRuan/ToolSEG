@@ -250,7 +250,7 @@ public class Histogram {
 
 
         StringBuilder s = new StringBuilder();
-        s.append(String.format("##### %s ; Loci count = %d #####\n", name, count));
+        s.append(String.format("##### %s ; count = %d #####\n", name, count));
 
         s.append(String.format("%s Histogram %4d:\t [%s : %.5f]\t freq = %d \n",
                 rowText, 0, "  -Inf ", thresh[0], freq[0]));
@@ -340,7 +340,7 @@ public class Histogram {
     }
 
 }
-//        for (int i = maxIndex - 1; i > 0; i--) { //ÐèÒªÒª¸Ä½ø£¬²»ÄÜ¿çµ½ÁíÒ»¸ö·åÉÏÈ¥ÁË
+//        for (int i = maxIndex - 1; i > 0; i--) { //ï¿½ï¿½ÒªÒªï¿½Ä½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü¿çµ½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¥ï¿½ï¿½
 //            if (Math.abs(newFreq[i] / newFreq[maxIndex] - 1) < peakRatio) {
 //                th[0] = thresh[i - 1];
 //            }
