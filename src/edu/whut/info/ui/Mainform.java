@@ -97,6 +97,7 @@ public class Mainform {
     private JRadioButton bypassRadioButton;
     private JRadioButton log2RadioButton;
     private JRadioButton power2RadioButton;
+    private JTextField BCLTLambdatxt;
     private Logger m_log;
 
     private int transformMethod;
@@ -136,6 +137,7 @@ public class Mainform {
         //BCLT params
         BCLTLengtxt.setText("200");
         BCLTpvaluetxt.setText("0.05");
+        BCLTLambdatxt.setText("0.1");
 
         //preprocess
         outliertxt.setText("2.5");
@@ -144,9 +146,9 @@ public class Mainform {
 //        segmentlengthtxt.setText("20000,4000,500,10000,5000");
 //        cnvaluetxt.setText("1,2,1,2,3");
 //        variancetxt.setText("0.2,0.2,0.3,0.3,0.2");
-        cnvaluetxt.setText("1,3,2,4");
-        variancetxt.setText("0.4,0.4,0.4,0.4");
-        segmentlengthtxt.setText("300,300,300,300");
+        cnvaluetxt.setText("1,3,2,4,1,3,2");
+        variancetxt.setText("0.4,0.4,0.4,0.4,0.4,0.4,0.4");
+        segmentlengthtxt.setText("3000,2000,3000,5000,4000,5000,4000");
 
 
         System.out.println();
@@ -232,7 +234,8 @@ public class Mainform {
                     case 6:
                         length = Integer.valueOf(BCLTLengtxt.getText());
                         p = Double.valueOf(BCLTpvaluetxt.getText());
-                        cutterAlgorithm = new BCLT(p, length);
+                        double lambda = Double.valueOf(BCLTLambdatxt.getText());
+                        cutterAlgorithm = new BCLT(p, length, lambda);
                         break;
                 }
 

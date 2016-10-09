@@ -89,7 +89,7 @@ public class CNSegment {
 
             m_log.info(String.format("Time = %d ms",t2 - t1));
         }
-        drawProbeSets(chros, result, method);
+        //drawProbeSets(chros, result, method);
         //    cutter.splitChromosome(cacheSample.get(1),result.get(1),chrIds.get(1));
         // drawChromosome(chros.get(2),result.get(1),30);
     }

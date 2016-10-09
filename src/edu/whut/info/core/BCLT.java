@@ -9,7 +9,6 @@ import org.apache.commons.math3.distribution.NormalDistribution;
 
 import java.io.*;
 import java.util.*;
-import java.util.function.BooleanSupplier;
 import java.util.logging.Logger;
 
 /**
@@ -20,6 +19,7 @@ import java.util.logging.Logger;
 public class BCLT implements SegmentCutter {
     private double PVALUE_THRESH = 0.05;
     private int MIN_SEG_LENGTH = 200;
+    private double LAMBDA = 0.1;
     private String methodname = "BCLT";
     private double[] chromosome;
     private Logger m_log;
@@ -31,11 +31,12 @@ public class BCLT implements SegmentCutter {
 
     private double[] diff;
 
-    public BCLT(double pvalueThre, int minSegLen) {
+    public BCLT(double pvalueThre, int minSegLen, double lambda) {
         m_log = Logger.getLogger("segment");
 
         this.PVALUE_THRESH = pvalueThre;
         this.MIN_SEG_LENGTH = minSegLen;
+        this.LAMBDA = lambda;
         norm = new NormalDistribution(0, 1);
         zTree = new SegTree();
     }
@@ -93,8 +94,8 @@ public class BCLT implements SegmentCutter {
             sum += data[j];
             IntegralCN[j + 1] = sum;
         }
-        robustSTD = getRobustStd();
-
+        robustSTD = getRobustStd() + LAMBDA;
+        m_log.info(String.format("Revised Robust Std = %f, LAMBDA = %.3f", robustSTD,LAMBDA));
     }
 
     private double getRobustStd() {
@@ -134,7 +135,7 @@ public class BCLT implements SegmentCutter {
             //分段完成
             input.isReady = true;
             output.add(input);
-            zTree.setZValue(parent, 0);
+            zTree.setZValue(parent, input.stdCopyNumber);
             zTree.setBreakPosition(parent, -1, 'C');
             return;
         }
@@ -186,8 +187,14 @@ public class BCLT implements SegmentCutter {
                 }
             }
         }
-        zTree.setZValue(parent, maxZ);
-        zTree.setBreakPosition(parent, maxPos, windowModel);
+        if (maxZ > 0){
+            zTree.setZValue(parent, maxZ);
+            zTree.setBreakPosition(parent, maxPos, windowModel);
+        }else{
+            zTree.setZValue(parent, input.stdCopyNumber);
+            zTree.setBreakPosition(parent, -1, 'C');
+        }
+
 
         if (maxZ > robustSTD && maxPos > 0) {
             int newBreak = maxPos;
@@ -345,6 +352,60 @@ public class BCLT implements SegmentCutter {
             return child;
         }
 
+//        public double calculateRate(BinaryTreeNode node){
+//            List<Double> zArray = new ArrayList<>();
+//
+//            List<Integer> path = getPath2Root(node);
+//            for(int value : path){
+//                double z = zMap.get(value);
+//                zArray.add(z);
+//            }
+//            int count = zArray.size();
+//
+//            if (count == 1) {
+//                return zArray.get(0);
+//            }else if (count == 2){
+//                return Math.abs(zArray.get(1) - zArray.get(0));
+//            }else{
+//                int step = (count >>1) + 1;
+//                step = Math.min(step,3);
+//
+//                double sum1 = 0,sum2 = 0;
+//                for (int i = 0; i < step; i++){
+//                    sum1 += zArray.get(i);
+//                    sum2 += zArray.get(i+1);
+//                }
+//                return Math.abs(sum2 - sum1)/step;
+//            }
+//        }
+
+        public double calculateRate(BinaryTreeNode node){
+            BinaryTreeNode parent = node.getParent();
+
+//            if (parent == null) {
+//                return zMap.get(node.getData());
+//            }else{
+//                return Math.abs(zMap.get(parent.getData()) - zMap.get(node.getData()));
+//            }
+            if (parent == null) {
+                return 1;
+            }else{
+                double r1 = segments.get(node.getData()).stdCopyNumber;
+                double r2 = segments.get(parent.getData()).stdCopyNumber;
+                return (1. - r1/r2);
+            }
+        }
+
+        public List<Integer> getPath2Root(BinaryTreeNode node){
+            List<Integer> temp = new ArrayList<>();
+
+            BinaryTreeNode mySelf = node;
+            while (mySelf != null){
+                temp.add((Integer) mySelf.getData());
+                mySelf = mySelf.getParent();
+            }
+            return temp;
+        }
 
         public String toString() {
             StringBuilder result = new StringBuilder();
@@ -359,15 +420,16 @@ public class BCLT implements SegmentCutter {
                 int id = kv.getKey();
 
                 int len = zArray.indexOf(z);
-                int tm = breakType.get(id);
 
                 StringBuilder temp = new StringBuilder();
                 for (int j = 0; j < len; j++) {
                     temp.append("-");
                 }
 
-                zString.put(id, String.format("\t z = %.4f [%c] <-%s [%02d]",
-                        z, tm, temp.toString(), zArray.size() - len));
+//                zString.put(id, String.format("\t z = %.4f [%c] <-%s [%02d]",
+//                        z, tm, temp.toString(), zArray.size() - len));
+                  zString.put(id, String.format("\t<-%s [%02d]",
+                        temp.toString(), zArray.size() - len));
             }
 
             mTreeRoot.traverseInorder(new BinaryTreeNode.Visitor() {
@@ -375,19 +437,24 @@ public class BCLT implements SegmentCutter {
                 public void visit(BinaryTreeNode node) {
                     int leftid, rightid, breakpos, startpos, endpos;
 
+                    int id = (int)node.getData();
+                    double z = zMap.get(id);
+                    double rate = calculateRate(node);
+                    int tm = breakType.get(id);
+
                     if (node.getRight() == null || node.getLeft() == null) {
                         startpos = segments.get(node.getData()).Start();
                         endpos = segments.get(node.getData()).End();
-                        result.append(String.format("Seg: %4d = (XXXX:XXXX) <% 8d><--------><% 8d> %s",
-                                node.getData(), startpos, endpos, zString.get(node.getData())));
+                        result.append(String.format("Seg: %4d = (XXXX:XXXX) <% 8d><--------><% 8d> (id,z,r) = (% 4d,%.4f,%+1.4f)[%c]%s",
+                                node.getData(), startpos, endpos, node.getData(),z,rate,tm,zString.get(node.getData())));
                     } else {
                         leftid = (Integer) node.getLeft().getData();
                         rightid = (Integer) node.getRight().getData();
                         breakpos = segments.get(node.getRight().getData()).Start();
                         startpos = segments.get(node.getData()).Start();
                         endpos = segments.get(node.getData()).End();
-                        result.append(String.format("Seg: %4d = (% 4d:% 4d) <% 8d><% 8d><% 8d> %s",
-                                node.getData(), leftid, rightid, startpos, breakpos, endpos, zString.get(node.getData())));
+                        result.append(String.format("Seg: %4d = (% 4d:% 4d) <% 8d><% 8d><% 8d> (id,z,r) = (% 4d,%.4f,%+1.4f)[%c]%s",
+                                node.getData(), leftid, rightid, startpos, breakpos, endpos,node.getData(), z,rate,tm,zString.get(node.getData())));
                     }
 
                     result.append('\n');
