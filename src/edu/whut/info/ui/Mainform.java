@@ -749,7 +749,7 @@ public class Mainform {
 //                    ProbeSet p=new ProbeSet();
 //                    p.data.CopyNumberHalf=Double.valueOf(newarr.get(2));
 //                    chro.probes.put(Long.valueOf(newarr.get(1)),p);
-                    double cnhalf = Double.valueOf(newarr.get(2)) * 2;
+                    double cnhalf = Double.valueOf(newarr.get(2));
                     chro.probes.add(cnhalf);
                 } else {
                     chrId = Integer.valueOf(newarr.get(0));

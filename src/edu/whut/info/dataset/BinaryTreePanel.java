@@ -65,9 +65,9 @@ public class BinaryTreePanel extends JPanel {
         tree.traversePostorder(new BinaryTreeNode.Visitor() {
             public void visit(BinaryTreeNode node) {
                 String data = node.getData().toString();
-                Point center = (Point)coordinates.get(node);
+                Point center = coordinates.get(node);
                 if (node.getParent() != null) {
-                    Point parentPoint = (Point)coordinates.get(node.getParent());
+                    Point parentPoint = coordinates.get(node.getParent());
                     g.setColor(Color.black);
                     g.drawLine(center.x, center.y, parentPoint.x, parentPoint.y);
                 }

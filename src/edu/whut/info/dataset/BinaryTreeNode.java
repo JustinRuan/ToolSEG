@@ -79,7 +79,7 @@ public interface BinaryTreeNode<E> {
     /**
      * Simple visitor interface.
      */
-    public interface Visitor {
+    interface Visitor {
         <E> void visit(BinaryTreeNode<E> node);
     }
 }

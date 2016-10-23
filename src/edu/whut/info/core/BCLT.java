@@ -62,6 +62,7 @@ public class BCLT implements SegmentCutter {
 
         printZHistogram();
         m_log.info(zTree.toString());
+        m_log.info(String.format("Quality = %.4f",zTree.calculateQuality()));
 
         m_log.info(String.format("#### #### #### chr %02d: Loci Count = %05d; \t Segments Count = %d",
                 Chr_id, data.length, result.size()));
@@ -177,10 +178,10 @@ public class BCLT implements SegmentCutter {
                     z1 = calculateZ(input, left, j);
                     z2 = calculateZ(input, j, right);
 
-                    //z3 = Math.pow(Math.sqrt(Math.abs(z1)) + Math.sqrt(Math.abs(z2)), 2.0);
-                    z3 = Math.max(Math.abs(z1), Math.abs(z2));
+                    z3 = Math.pow(Math.sqrt(Math.abs(z1)) + Math.sqrt(Math.abs(z2)), 2.0);
+
                     if (z3 > maxZsearch) {
-                        maxZ = z3;
+                        maxZ = Math.max(Math.abs(z1), Math.abs(z2));
                         maxZsearch = z3;
                         maxPos = j;
                     }
@@ -405,6 +406,28 @@ public class BCLT implements SegmentCutter {
                 mySelf = mySelf.getParent();
             }
             return temp;
+        }
+
+        public double calculateQuality(){
+            if (zTree.zMap.size() == 1) return -100;
+
+            final double[] result = new double[2];
+            result[0] = Double.MAX_VALUE;
+            result[1] = Double.MIN_VALUE;
+
+            mTreeRoot.traverseInorder(new BinaryTreeNode.Visitor() {
+                @Override
+                public void visit(BinaryTreeNode node) {
+                    double z = zMap.get(node.getData());
+
+                    if (node.getLeft() != null && node.getRight() != null) {
+                        result[0] = (z < result[0]) ? z : result[0];
+                    } else {//叶子节点
+                        result[1] = (z > result[1]) ? z : result[1];
+                    }
+                }
+            });
+            return result[0] - result[1];
         }
 
         public String toString() {

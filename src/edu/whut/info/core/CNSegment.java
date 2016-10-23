@@ -217,7 +217,7 @@ public class CNSegment {
             step = estimatedLength / 2000;
         }
 
-        int width = (int) (estimatedLength / step);
+        int width = estimatedLength / step;
         int height = 400 * result.size();
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = (Graphics2D) image.getGraphics();
