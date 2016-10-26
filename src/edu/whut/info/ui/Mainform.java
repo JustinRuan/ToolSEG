@@ -181,6 +181,7 @@ public class Mainform {
                 myCore.generator.setStdSet(variance);
                 double normalpercent = Double.valueOf(percenttxt.getText());
                 Chromosome chro = null;
+                m_log.info(String.format("chro num %d",chrId));
                 switch (dataGenerate) {
                     case 0:
                         chro = myCore.generator.chromoGeneratorByRandom(normalpercent);
