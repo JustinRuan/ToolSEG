@@ -122,15 +122,17 @@ public class ChromoGenerator {
             List<Double> values = rawdata.get(cn1);
             int size = values.size();
             Random r = new Random(23);
+            List<Double> temp=new ArrayList<>();
             for (int j = 0; j < length; j++) {
                 int lg = j % size;
                 double copyNumberHalf = values.get(lg) * (1 - normalPercent) + 2 * normalPercent;
                 chro.probes.add(copyNumberHalf);
+                temp.add(copyNumberHalf);
                 startIndex++;
             }
             chro.changepoints.add(startIndex);
             segNum++;
-            m_log.info(String.format("the original %2d segment:\t length=%8d\t mean=%.4f\t std=%.4f\t", segNum, length, BioToolbox.mean(values), BioToolbox.std(values)));
+            m_log.info(String.format("the original %2d segment:\t length=%8d\t mean=%.4f\t std=%.4f\t", segNum, length, BioToolbox.mean(temp), BioToolbox.std(temp)));
         }
         chro.changepoints.remove(chro.changepoints.get(chro.changepoints.size() - 1));
         return chro;
