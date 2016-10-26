@@ -1,5 +1,6 @@
 package edu.whut.info.core;
 
+import edu.whut.info.dataset.Result;
 import edu.whut.info.dataset.Segment;
 import edu.whut.info.util.BioToolbox;
 
@@ -129,5 +130,10 @@ public class PCFSegment implements SegmentCutter {
     @Override
     public void prepareCopyNumberSegment(double[] data) {
 
+    }
+
+    @Override
+    public List<Result> getResult() {
+        return null;
     }
 }

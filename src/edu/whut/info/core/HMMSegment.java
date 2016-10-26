@@ -3,6 +3,7 @@ package edu.whut.info.core;
 import be.ac.ulg.montefiore.run.jahmm.Hmm;
 import be.ac.ulg.montefiore.run.jahmm.ObservationReal;
 import edu.whut.info.dataset.ObservationRealEx;
+import edu.whut.info.dataset.Result;
 import edu.whut.info.dataset.Segment;
 import edu.whut.info.util.BioToolbox;
 import edu.whut.info.util.ForwardBackwardCalculatorByBigDecimal;
@@ -359,4 +360,8 @@ public class HMMSegment implements SegmentCutter {
         return methodName;
     }
 
+    @Override
+    public List<Result> getResult() {
+        return null;
+    }
 }

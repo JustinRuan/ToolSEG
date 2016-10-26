@@ -1,5 +1,6 @@
 package edu.whut.info.core;
 
+import edu.whut.info.dataset.Result;
 import edu.whut.info.dataset.Segment;
 import edu.whut.info.util.BioToolbox;
 import smile.regression.LASSO;
@@ -157,5 +158,10 @@ public class LassoSegment implements SegmentCutter {
             data[i] = BioToolbox.log2(data[i]);
         }
 
+    }
+
+    @Override
+    public List<Result> getResult() {
+        return null;
     }
 }

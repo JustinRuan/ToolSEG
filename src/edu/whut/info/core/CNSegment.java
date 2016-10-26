@@ -2,8 +2,10 @@ package edu.whut.info.core;
 
 import com.google.common.primitives.Doubles;
 import edu.whut.info.dataset.Chromosome;
+import edu.whut.info.dataset.Result;
 import edu.whut.info.dataset.Segment;
 import edu.whut.info.util.BioToolbox;
+import org.apache.commons.math3.analysis.function.Max;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -45,12 +47,12 @@ public class CNSegment {
             List<Double> values = chros.get(i).probes;
 
             double[] cnArray = Doubles.toArray(values);
-            if (ratio > 0){
+            if (ratio > 0) {
                 cnArray = BioToolbox.limitFiltering(cnArray, ratio);
             }
 
             //transform
-            switch (method){
+            switch (method) {
                 case 1:
                     for (int j = 0; j < cnArray.length; j++) {
                         cnArray[j] = BioToolbox.log2(cnArray[j]);
@@ -58,13 +60,52 @@ public class CNSegment {
                     break;
                 case 2:
                     for (int j = 0; j < cnArray.length; j++) {
-                        cnArray[j] = Math.pow(2,cnArray[j]);
+                        cnArray[j] = Math.pow(2, cnArray[j]);
                     }
                     break;
                 default:
                     //do nothing;
             }
             cacheSample.add(cnArray);
+        }
+    }
+
+    public void analysisResult(List<Long> breakPoints, List<Result> results, int chrid) {
+        List<Integer> bps = new LinkedList<>();
+        for (long t : breakPoints) {
+            bps.add((int) t - 1);
+        }
+
+        for (Result r : results) {
+            if (r.pos > 0) {
+                int Maxdist = Integer.MAX_VALUE;
+                int index = -1;
+                for (int i = 0; i < bps.size(); i++) {
+                    int d = Math.abs(bps.get(i) - r.pos);
+                    if (d < Maxdist){
+                        Maxdist = d;
+                        index = i;
+                    }
+                }
+                if (Maxdist < 30){
+                    r.nearestBreakPoint = bps.get(index);
+                    bps.remove(index);
+                }
+            }
+        }
+
+        if (!bps.isEmpty()){
+            for (int pos : bps){
+                Result r = new Result();
+                r.pos = 0;
+                r.nearestBreakPoint = pos;
+                r.value1 = -1;
+                results.add(r);
+            }
+        }
+
+        for (Result r : results){
+            m_log.info(String.format("% 4d\t% 4d\t%d\t%d\t%f",chrid,r.id,r.pos,r.nearestBreakPoint,r.value1));
         }
     }
 
@@ -77,8 +118,7 @@ public class CNSegment {
         for (int i = 0; i < nums; i++) {
             result.add(new TreeSet<Segment>());
         }
-//        Set<Segment> temp = new TreeSet<>();
-//        // drawChromosome(chros.get(2),temp,30);
+
         ArrayList<Short> chrIds = new ArrayList<>();
         for (int i = 0; i < nums; i++)
             chrIds.add(chros.get(i).chrId);
@@ -86,10 +126,19 @@ public class CNSegment {
             long t1 = System.currentTimeMillis();
             cutter.splitChromosome(cacheSample.get(i), result.get(i), chrIds.get(i));
             long t2 = System.currentTimeMillis();
+            //m_log.info(String.format("Time = %d ms", t2 - t1));
 
-            m_log.info(String.format("Time = %d ms",t2 - t1));
+            List<Long> breakPoints = chros.get(i).changepoints;
+            List<Result> rList = cutter.getResult();
+
+            analysisResult(breakPoints, rList, i);
         }
+
+        //画出分段结果
         //drawProbeSets(chros, result, method);
+
+
+        //只分一段
         //    cutter.splitChromosome(cacheSample.get(1),result.get(1),chrIds.get(1));
         // drawChromosome(chros.get(2),result.get(1),30);
     }
@@ -208,12 +257,12 @@ public class CNSegment {
         for (Chromosome chro : chros) {
             maxLength = Math.max(maxLength, chro.probes.size());
         }
-        int estimatedLength = (int)(1.15 * maxLength);
+        int estimatedLength = (int) (1.15 * maxLength);
 
         int step;
-        if (estimatedLength < 2000){
+        if (estimatedLength < 2000) {
             step = 1;
-        }else{
+        } else {
             step = estimatedLength / 2000;
         }
 
@@ -255,9 +304,9 @@ public class CNSegment {
                 double cnValue;
 
                 //transform
-                switch (method){
+                switch (method) {
                     case 1:
-                        cnValue = Math.pow(2,s.CopyNumber);
+                        cnValue = Math.pow(2, s.CopyNumber);
                         break;
                     case 2:
                         cnValue = BioToolbox.log2(s.CopyNumber);
@@ -289,5 +338,6 @@ public class CNSegment {
         }
 
     }
+
 }
 

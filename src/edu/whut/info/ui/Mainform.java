@@ -135,7 +135,7 @@ public class Mainform {
         gama.setText("20");
 
         //BCLT params
-        BCLTLengtxt.setText("200");
+        BCLTLengtxt.setText("50");
         BCLTpvaluetxt.setText("0.05");
         BCLTLambdatxt.setText("0.1");
 

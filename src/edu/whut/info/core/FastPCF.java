@@ -1,5 +1,6 @@
 package edu.whut.info.core;
 
+import edu.whut.info.dataset.Result;
 import edu.whut.info.dataset.Segment;
 import edu.whut.info.util.BioToolbox;
 
@@ -219,5 +220,10 @@ public class FastPCF implements SegmentCutter {
         index.add(length);
 
         return index;
+    }
+
+    @Override
+    public List<Result> getResult() {
+        return null;
     }
 }

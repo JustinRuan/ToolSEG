@@ -1,7 +1,9 @@
 package edu.whut.info.core;
 
+import edu.whut.info.dataset.Result;
 import edu.whut.info.dataset.Segment;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -16,5 +18,7 @@ public interface SegmentCutter {
     String getMethodName();
 
     void prepareCopyNumberSegment(double[] data);
+
+    List<Result> getResult();
 
 }

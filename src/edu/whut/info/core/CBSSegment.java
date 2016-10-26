@@ -1,5 +1,6 @@
 package edu.whut.info.core;
 
+import edu.whut.info.dataset.Result;
 import edu.whut.info.dataset.Segment;
 import edu.whut.info.util.BioToolbox;
 
@@ -264,5 +265,10 @@ public class CBSSegment implements SegmentCutter {
             sum += data[j];
             IntegralCN[j + 1] = sum;
         }
+    }
+
+    @Override
+    public List<Result> getResult() {
+        return null;
     }
 }

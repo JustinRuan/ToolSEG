@@ -1,5 +1,6 @@
 package edu.whut.info.core;
 
+import edu.whut.info.dataset.Result;
 import edu.whut.info.dataset.Segment;
 import edu.whut.info.util.BioToolbox;
 import org.apache.commons.math3.distribution.NormalDistribution;
@@ -326,6 +327,11 @@ public class CLTSegment implements SegmentCutter {
             default:
 
         }
+    }
+
+    @Override
+    public List<Result> getResult() {
+        return null;
     }
 }
 
