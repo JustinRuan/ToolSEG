@@ -105,7 +105,7 @@ public class CNSegment {
         }
 
         for (Result r : results){
-            m_log.info(String.format("% 4d\t% 4d\t%d\t%d\t%f",chrid,r.id,r.pos,r.nearestBreakPoint,r.value1));
+            m_log.info(String.format("\t% 4d\t% 4d\t%d\t%d\t%f",chrid,r.id,r.pos,r.nearestBreakPoint,r.value1));
         }
     }
 
