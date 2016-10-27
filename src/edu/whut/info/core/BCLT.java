@@ -31,7 +31,7 @@ public class BCLT implements SegmentCutter {
     private SegTree zTree;
 
     private double[] diff;
-    private final boolean Show_Debug = false;
+    private final boolean Show_Debug = true;
 
     public BCLT(double pvalueThre, int minSegLen, double lambda) {
         m_log = Logger.getLogger("segment");

@@ -108,7 +108,29 @@ public class CNSegment {
             m_log.info(String.format("% 4d\t% 4d\t%d\t%d\t%f",chrid,r.id,r.pos,r.nearestBreakPoint,r.value1));
         }
     }
-
+    public void printOriginalSegment(Chromosome chro){
+        Set<Segment> result=new TreeSet<>();
+        List<Long> changepoints=chro.changepoints;
+        Segment input = new Segment();
+        input.setChr_id(chro.chrId);
+        input.setRange(0, chro.getLength());
+        long start=0,end=0;
+        for(int i=0;i<changepoints.size();i++){
+             end=changepoints.get(i);
+             result.add(input.getSubSegment((int)start,(int)end));
+            start=end;
+        }
+        result.add(input.getSubSegment((int)end,chro.getLength()));
+        int i = 1;
+        double[] data=new double[chro.getLength()];
+        for (int j=0;j<chro.getLength();j++)
+            data[j]=chro.probes.get(j);
+        for (Segment seg : result) {
+            BioToolbox.refreshSegment(seg,data);
+            m_log.info(seg.getCharacterString());
+            i++;
+        }
+    }
     public void splitChromosome(ArrayList<Chromosome> chros, double ratio, int method) {
         result.clear();
         //loading(chros);
@@ -123,6 +145,7 @@ public class CNSegment {
         for (int i = 0; i < nums; i++)
             chrIds.add(chros.get(i).chrId);
         for (int i = 0; i < nums; i++) {
+            printOriginalSegment(chros.get(i));
             long t1 = System.currentTimeMillis();
             cutter.splitChromosome(cacheSample.get(i), result.get(i), chrIds.get(i));
             long t2 = System.currentTimeMillis();

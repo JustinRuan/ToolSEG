@@ -255,7 +255,7 @@ public class Mainform {
                         List<ArrayList<Chromosome>> datas = new ArrayList<ArrayList<Chromosome>>();
                         ArrayList<String> files = null;
                         try {
-                            boolean flag = false;
+                            boolean flag = true;
                             if (flag) {
                                 data1 = readCNtxt(filepath);
                                 datas.add(data1);

@@ -3,6 +3,7 @@
  */
 package edu.whut.info.util;
 
+import edu.whut.info.dataset.Segment;
 import org.apache.commons.math3.analysis.function.Gaussian;
 import org.apache.commons.math3.util.MathArrays;
 
@@ -709,6 +710,19 @@ public class BioToolbox {
             }
         }
         return result;
+    }
+    public static void refreshSegment(Segment seg,double[] chromosome) {
+        if (seg.isDirty) {
+            double[] ms;
+            ms = BioToolbox.robustMean(chromosome, seg.Start(), seg.End(), 0);
+//            if (ms == null){
+//                System.out.println();
+//            }
+            seg.CopyNumber = ms[0];
+            seg.stdCopyNumber = ms[1];
+
+            seg.isDirty = false;
+        }
     }
 
 
