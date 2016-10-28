@@ -135,7 +135,7 @@ public class Mainform {
         gama.setText("20");
 
         //BCLT params
-        BCLTLengtxt.setText("50");
+        BCLTLengtxt.setText("20");
         BCLTpvaluetxt.setText("0.05");
         BCLTLambdatxt.setText("0.1");
 
@@ -255,7 +255,7 @@ public class Mainform {
                         List<ArrayList<Chromosome>> datas = new ArrayList<ArrayList<Chromosome>>();
                         ArrayList<String> files = null;
                         try {
-                            boolean flag = true;
+                            boolean flag = false;
                             if (flag) {
                                 data1 = readCNtxt(filepath);
                                 datas.add(data1);
@@ -709,9 +709,10 @@ public class Mainform {
     private ArrayList<String> readFilePath(String filepath) throws IOException {
         ArrayList<String> result = new ArrayList<>();
         BufferedReader in = new BufferedReader(new FileReader(filepath));
-        String s;
-        while (!(s = in.readLine()).isEmpty()) {
+        String s = in.readLine();
+        while (s != null && !s.isEmpty()) {
             result.add(s);
+            s = in.readLine();
         }
         return result;
     }

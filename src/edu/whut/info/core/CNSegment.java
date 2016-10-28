@@ -87,7 +87,7 @@ public class CNSegment {
                         index = i;
                     }
                 }
-                if (Maxdist < 30){
+                if (Maxdist < 30 ){
                     r.nearestBreakPoint = bps.get(index);
                     bps.remove(index);
                 }
@@ -99,7 +99,20 @@ public class CNSegment {
                 Result r = new Result();
                 r.pos = 0;
                 r.nearestBreakPoint = pos;
-                r.value1 = -1;
+
+                Result temp = null;
+                for (Result r2 : results) {
+                    if (r2.pos > pos) {
+                        break;
+                    }else if (r2.pos == 0){
+                        temp = r2;
+                    }
+                }
+                if (temp != null){
+                    r.value1 = temp.value1;
+                }else{
+                    r.value1 = -1;
+                }
                 results.add(r);
             }
         }
@@ -145,7 +158,7 @@ public class CNSegment {
         for (int i = 0; i < nums; i++)
             chrIds.add(chros.get(i).chrId);
         for (int i = 0; i < nums; i++) {
-            printOriginalSegment(chros.get(i));
+           // printOriginalSegment(chros.get(i));
             long t1 = System.currentTimeMillis();
             cutter.splitChromosome(cacheSample.get(i), result.get(i), chrIds.get(i));
             long t2 = System.currentTimeMillis();
