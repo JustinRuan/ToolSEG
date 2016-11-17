@@ -1,6 +1,7 @@
 package edu.whut.info.core;
 
 import com.google.common.primitives.Doubles;
+import edu.whut.info.analysis.ResultAnalysis;
 import edu.whut.info.dataset.Chromosome;
 import edu.whut.info.dataset.Result;
 import edu.whut.info.dataset.Segment;
@@ -70,57 +71,59 @@ public class CNSegment {
         }
     }
 
-    public void analysisResult(List<Long> breakPoints, List<Result> results, int chrid) {
-        List<Integer> bps = new LinkedList<>();
-        for (long t : breakPoints) {
-            bps.add((int) t - 1);
-        }
 
-        for (Result r : results) {
-            if (r.pos > 0) {
-                int Maxdist = Integer.MAX_VALUE;
-                int index = -1;
-                for (int i = 0; i < bps.size(); i++) {
-                    int d = Math.abs(bps.get(i) - r.pos);
-                    if (d < Maxdist){
-                        Maxdist = d;
-                        index = i;
-                    }
-                }
-                if (Maxdist < 30 ){
-                    r.nearestBreakPoint = bps.get(index);
-                    bps.remove(index);
-                }
-            }
-        }
-
-        if (!bps.isEmpty()){
-            for (int pos : bps){
-                Result r = new Result();
-                r.pos = 0;
-                r.nearestBreakPoint = pos;
-
-                Result temp = null;
-                for (Result r2 : results) {
-                    if (r2.pos > pos) {
-                        break;
-                    }else if (r2.pos == 0){
-                        temp = r2;
-                    }
-                }
-                if (temp != null){
-                    r.value1 = temp.value1;
-                }else{
-                    r.value1 = -1;
-                }
-                results.add(r);
-            }
-        }
-
-        for (Result r : results){
-            m_log.info(String.format("\t% 4d\t% 4d\t%d\t%d\t%f",chrid,r.id,r.pos,r.nearestBreakPoint,r.value1));
-        }
-    }
+//   原来的
+//   public void analysisResult(List<Long> breakPoints, List<Result> results, int chrid) {
+//        List<Integer> bps = new LinkedList<>();
+//        for (long t : breakPoints) {
+//            bps.add((int) t - 1);
+//        }
+//
+//        for (Result r : results) {
+//            if (r.pos > 0) {
+//                int Maxdist = Integer.MAX_VALUE;
+//                int index = -1;
+//                for (int i = 0; i < bps.size(); i++) {
+//                    int d = Math.abs(bps.get(i) - r.pos);
+//                    if (d < Maxdist){
+//                        Maxdist = d;
+//                        index = i;
+//                    }
+//                }
+//                if (Maxdist < 30 ){
+//                    r.nearestBreakPoint = bps.get(index);
+//                    bps.remove(index);
+//                }
+//            }
+//        }
+//
+//        if (!bps.isEmpty()){
+//            for (int pos : bps){
+//                Result r = new Result();
+//                r.pos = 0;
+//                r.nearestBreakPoint = pos;
+//
+//                Result temp = null;
+//                for (Result r2 : results) {
+//                    if (r2.pos > pos) {
+//                        break;
+//                    }else if (r2.pos == 0){
+//                        temp = r2;
+//                    }
+//                }
+//                if (temp != null){
+//                    r.value1 = temp.value1;
+//                }else{
+//                    r.value1 = -1;
+//                }
+//                results.add(r);
+//            }
+//        }
+//
+//        for (Result r : results){
+//            m_log.info(String.format("\t% 4d\t% 4d\t%d\t%d\t%f",chrid,r.id,r.pos,r.nearestBreakPoint,r.value1));
+//        }
+//    }
     public void printOriginalSegment(Chromosome chro){
         Set<Segment> result=new TreeSet<>();
         List<Long> changepoints=chro.changepoints;
@@ -164,10 +167,14 @@ public class CNSegment {
             long t2 = System.currentTimeMillis();
             //m_log.info(String.format("Time = %d ms", t2 - t1));
 
-            List<Long> breakPoints = chros.get(i).changepoints;
-            List<Result> rList = cutter.getResult();
+            if (true) {//计算ROC曲线
+                List<Long> breakPoints = chros.get(i).changepoints;
+                List<Result> rList = cutter.getResult();
+                ResultAnalysis RA = new ResultAnalysis();
+                RA.initialize(breakPoints,cacheSample.get(i).length);
+                RA.analysisResult(rList, i);
+            }
 
-            analysisResult(breakPoints, rList, i);
         }
 
         //画出分段结果

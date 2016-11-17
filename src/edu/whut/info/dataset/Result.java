@@ -7,6 +7,4 @@ public class Result {
     public int id;
     public int pos;
     public double value1;
-
-    public int nearestBreakPoint;
 }

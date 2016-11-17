@@ -62,14 +62,24 @@ public class BCLT implements SegmentCutter {
 
         LinkedBinaryTreeNode<Integer> root = zTree.setRoot(input);
         splitChromosome(root, input, result, -1);
+
+        double[] disLeaf = zTree.calculatDistance();
+        double quality = disLeaf[0] - disLeaf[1];
         if (Show_Debug) {
             printZHistogram();
             m_log.info(zTree.toString());
-            m_log.info(String.format("Quality = %.4f", zTree.calculateQuality()));
+            m_log.info(String.format("Quality = %.4f", quality));
 
             m_log.info(String.format("#### #### #### chr %02d: Loci Count = %05d; \t Segments Count = %d",
                     Chr_id, data.length, result.size()));
+        }
 
+        if (quality < 0){
+            decideBreakPoints(result,Chr_id,disLeaf[1]);
+        }
+
+
+        if (Show_Debug) {
             int i = 1;
             for (Segment seg : result) {
                 refreshSegment(seg);
@@ -77,9 +87,39 @@ public class BCLT implements SegmentCutter {
                 i++;
             }
         }
-
-
     }
+
+    private void decideBreakPoints(Set<Segment> output, Short Chr_id, double thresh) {
+
+        Set<Integer> breakPositions = new TreeSet<>();
+        if (Show_Debug) {
+            m_log.info(String.format("final thresh of Z = %.4f", thresh));
+        }
+        for (Map.Entry<Integer, Double> kv : zTree.zMap.entrySet()) {
+            if (kv.getValue() > thresh) {
+                breakPositions.add(zTree.breakPositions.get(kv.getKey()));
+            }
+        }
+        breakPositions.add(0);
+        breakPositions.add(chromosome.length);
+
+        Set<Segment> temp = new TreeSet<>();
+
+        int start = 0;
+        for (int end : breakPositions) {
+            if (end > 0) {
+                Segment newSeg = new Segment();
+                newSeg.setChr_id(Chr_id);
+                newSeg.setRange(start, end);
+
+                refreshSegment(newSeg);
+                temp.add(newSeg);
+            }
+            start = end;
+        }
+        output.clear();;
+        output.addAll(temp);
+}
 
 
     @Override
@@ -416,8 +456,8 @@ public class BCLT implements SegmentCutter {
             return temp;
         }
 
-        public double calculateQuality() {
-            if (zTree.zMap.size() == 1) return -100;
+        public double[] calculatDistance() {
+            if (zTree.zMap.size() == 1) return new double[]{0,0};
 
             final double[] result = new double[2];
             result[0] = Double.MAX_VALUE;
@@ -427,15 +467,16 @@ public class BCLT implements SegmentCutter {
                 @Override
                 public void visit(BinaryTreeNode node) {
                     double z = zMap.get(node.getData());
+                    int type = breakType.get(node.getData());
 
                     if (node.getLeft() != null && node.getRight() != null) {
-                        result[0] = (z < result[0]) ? z : result[0];
+                        result[0] = (z < result[0]) ? z : result[0];//非叶子节点
                     } else {//叶子节点
                         result[1] = (z > result[1]) ? z : result[1];
                     }
                 }
             });
-            return result[0] - result[1];
+            return result;
         }
 
         public String toString() {
@@ -521,6 +562,22 @@ public class BCLT implements SegmentCutter {
                     rList.add(r);
                 }
             });
+            int[] posArray = new int[rList.size()];
+            for (int i = 0; i < rList.size(); i++){
+                posArray[i] = rList.get(i).pos;
+            }
+            posArray[0] = posArray[1] >> 1;
+            posArray[posArray.length - 1] = (posArray[posArray.length-2] + chromosome.length)/2;
+            for (int i = 1; i < posArray.length - 1; i++){
+                if (posArray[i] == 0){
+                    posArray[i] = (posArray[i-1] + posArray[i+1])/2;
+                }
+            }
+            for (int i = 0; i < rList.size(); i++){
+                if (rList.get(i).pos == 0){
+                    rList.get(i).pos = posArray[i];
+                }
+            }
 
             return rList;
         }
