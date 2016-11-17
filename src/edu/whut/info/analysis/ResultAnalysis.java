@@ -59,33 +59,47 @@ public class ResultAnalysis {
 
     }
 
-    private final boolean isIncluded(int pos, int[] range){
-        if (pos >= range[0] && pos < range[1]){
-            return true;
-        }else
-            return false;
+    private final boolean isIncluded(Result value, int[] range){
+        if (value.isBreakPoint){
+            if (value.pos >= range[0] && value.pos < range[1]){
+                return true;
+            }else
+                return false;
+        }else{
+            //是否相交
+            if (range[0] < value.range[1] && range[1] > value.range[0]){
+                return true;
+            }else
+                return false;
+        }
+
     }
 
     public void analysisResult(List<Result> results, int chrid) {
         int k = 0;
         int count = segRanges.size();
-        for (Result r : results){
-            for (int i = k; i<count; i++){
-                if (isIncluded(r.pos,segRanges.get(i))){
-                    double maxV = values.get(k);
-                    maxV = r.value1 > maxV ? r.value1:maxV;
-                    values.set(k,maxV);
-                    break;
-                }else{
-                    k++;
+
+        //判断结果落在什么区域，统计这个区域中最大Z值
+        for (int i = 0; i < count; i++) {
+            double maxV = 0;
+            int[] range = segRanges.get(i);
+            for (int j = 0; j < results.size(); j++) {
+                Result r = results.get(j);
+                if (isIncluded(r, range)) {
+                    maxV = r.value1 > maxV ? r.value1 : maxV;
                 }
             }
+            values.set(i, maxV);
         }
+
 
         for (int i = 0; i < segRanges.size(); i++){
             // chr id, range[S, E], isBreak, value
             int[] range = segRanges.get(i);
-            m_log.info(String.format("\t% 4d\t% 4d\t%d\t%s\t%f",chrid,range[0],range[1],includeBpt.get(i).toString(),values.get(i)));
+            double z = values.get(i);
+
+            m_log.info(String.format("\t% 4d\t% 4d\t%d\t%s\t%f",
+                    chrid,range[0],range[1],includeBpt.get(i).toString(),z));
         }
 
     }

@@ -161,7 +161,7 @@ public class CNSegment {
         for (int i = 0; i < nums; i++)
             chrIds.add(chros.get(i).chrId);
         for (int i = 0; i < nums; i++) {
-           // printOriginalSegment(chros.get(i));
+            // printOriginalSegment(chros.get(i));
             long t1 = System.currentTimeMillis();
             cutter.splitChromosome(cacheSample.get(i), result.get(i), chrIds.get(i));
             long t2 = System.currentTimeMillis();

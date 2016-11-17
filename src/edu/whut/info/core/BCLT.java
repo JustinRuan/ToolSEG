@@ -137,7 +137,7 @@ public class BCLT implements SegmentCutter {
             sum += data[j];
             IntegralCN[j + 1] = sum;
         }
-        robustSTD = getRobustStd() + LAMBDA;
+        robustSTD = Math.max(0.01,getRobustStd() + LAMBDA) ;
         if (Show_Debug) m_log.info(String.format("Revised Robust Std = %f, LAMBDA = %.3f", robustSTD, LAMBDA));
     }
 
@@ -553,29 +553,29 @@ public class BCLT implements SegmentCutter {
                     r.value1 = z / robustSTD;
 
                     if (node.getRight() == null || node.getLeft() == null) {
+                        r.isBreakPoint = false;
                         r.pos = 0;
                     } else {
                         breakpos = segments.get(node.getRight().getData()).Start();
+                        r.isBreakPoint = true;
                         r.pos = breakpos;
                     }
 
                     rList.add(r);
                 }
             });
-            int[] posArray = new int[rList.size()];
-            for (int i = 0; i < rList.size(); i++){
-                posArray[i] = rList.get(i).pos;
+
+            int[] posArray = new int[rList.size() + 2];
+            posArray[0] = 0;
+            posArray[1] = 0;
+            posArray[posArray.length - 1] =  chromosome.length-1;
+            for (int i = 1; i < rList.size(); i++){
+                posArray[i+1] = rList.get(i).pos;
             }
-            posArray[0] = posArray[1] >> 1;
-            posArray[posArray.length - 1] = (posArray[posArray.length-2] + chromosome.length)/2;
-            for (int i = 1; i < posArray.length - 1; i++){
-                if (posArray[i] == 0){
-                    posArray[i] = (posArray[i-1] + posArray[i+1])/2;
-                }
-            }
+
             for (int i = 0; i < rList.size(); i++){
                 if (rList.get(i).pos == 0){
-                    rList.get(i).pos = posArray[i];
+                    rList.get(i).range = new int[]{posArray[i], posArray[i+2]};
                 }
             }
 
