@@ -26,7 +26,7 @@ public class Segment implements Comparable<Segment>, Serializable {
     public double CopyNumber;
     public double stdCopyNumber;
 
-    public double purityCorrCopyNumber;
+    //public double purityCorrCopyNumber;
 
     public Segment() {
         isReady = false;
@@ -94,6 +94,13 @@ public class Segment implements Comparable<Segment>, Serializable {
     public String getCharacterString() {
         return String.format("Seg_id = % 6d : %02d;[% 6d - % 6d]\t Length =% 6d;\t robustAvg = %.4f \t robustStd = %.4f",
                 Seg_id, Chr_id, Start(), End(), length(), CopyNumber, stdCopyNumber);
+    }
+
+    public final boolean isIncluded(int pos) {
+        if (pos >= range.Start && pos < range.End) {
+            return true;
+        } else
+            return false;
     }
 
 }

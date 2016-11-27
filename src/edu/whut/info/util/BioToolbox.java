@@ -715,9 +715,6 @@ public class BioToolbox {
         if (seg.isDirty) {
             double[] ms;
             ms = BioToolbox.robustMean(chromosome, seg.Start(), seg.End(), 0);
-//            if (ms == null){
-//                System.out.println();
-//            }
             seg.CopyNumber = ms[0];
             seg.stdCopyNumber = ms[1];
 

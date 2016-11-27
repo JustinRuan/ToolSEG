@@ -98,6 +98,7 @@ public class Mainform {
     private JRadioButton log2RadioButton;
     private JRadioButton power2RadioButton;
     private JTextField BCLTLambdatxt;
+    private JCheckBox chkIsMultiFiles;
     private Logger m_log;
 
     private int transformMethod;
@@ -248,87 +249,26 @@ public class Mainform {
                 myCore.CnSegment.cutter = cutterAlgorithm;
                 switch (workModel) {
                     case 0:
-                        myCore.CnSegment.splitChromosome(chros, ratio, transformMethod);
+                        myCore.CnSegment.splitChromosome(chros, ratio, transformMethod, chkIsTestdata.isSelected());
                         break;
                     case 1:
-                        ArrayList<Chromosome> data1 = null;
-                        List<ArrayList<Chromosome>> datas = new ArrayList<ArrayList<Chromosome>>();
-                        ArrayList<String> files = null;
                         try {
-                            boolean flag = false;
-                            if (flag) {
-                                data1 = readCNtxt(filepath);
-                                datas.add(data1);
+                            boolean flag = chkIsMultiFiles.isSelected();
+                            if (!flag) {
+                                ArrayList<Chromosome> tmpData = readCNtxt(filepath);
+                                chros.addAll(tmpData);
                             } else {
-                                files = readFilePath(filepath);
+                                ArrayList<String> files = readFilePath(filepath);
                                 for (String path : files) {
-                                    data1 = readCNtxt(path);
-                                    datas.add(data1);
+                                    ArrayList<Chromosome> tmpData = readCNtxt(path);
+                                    chros.addAll(tmpData);
                                 }
                             }
                         } catch (IOException e1) {
                             e1.printStackTrace();
                         }
-                        for (ArrayList<Chromosome> data : datas) {
-                            if (chkIsTestdata.isSelected()) {
-                                Date date = new Date();
-                                SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");
-                                String filename = String.format("data%1$sResult_%2$s.txt",
-                                        File.separator, df.format(date));
-                                File output = new File(filename);
-                                try {
-                                    output.createNewFile();
-                                    BufferedWriter out = new BufferedWriter(new FileWriter(output));
-                                    out.write("Method\t\t numberOfSeg\t\t foundSeg\t\t Tolerance\t\t truePoint\t\t segTime\t\t \r\n");
-                                    for (int chr = 1; chr < data.size(); chr++) {
-                                        if (data.get(chr).probes.size() == 0)
-                                            continue;
-                                        m_log.info(String.format("the %2d chro is splitting ", chr));
-                                        long t1 = System.currentTimeMillis();
-                                        Set<Segment> result = new TreeSet<Segment>();
-                                        myCore.CnSegment.splitChromosome1(data.get(chr), result);
-                                        long t2 = System.currentTimeMillis();
-                                        m_log.info(String.format("Segmention time: %s ms", t2 - t1));
-                                        String series = myCore.CnSegment.cutter.getMethodName();
-                                        int totalchanges = data.get(chr).changepoints.size();
-                                        for (int tolerance = 0; tolerance <= 50; tolerance = tolerance + 5) {
-                                            int[] results = totalTP(data.get(chr), result, (long) tolerance);
-                                            System.out.println(String.format("%6d\t\t\t %6d\n", results[0], results[1]));
-                                            out.write(String.format("%20s\t\t %2d\t\t %2d\t\t %2d\t\t %2d\t\t %10d\n", series,
-                                                    totalchanges, result.size(), tolerance, results[0], t2 - t1));
-                                        }
-                                        int[] results = totalTP(data.get(chr), result, 15L);
-                                        m_log.info(String.format("%6d\t\t\t %6d\n", results[0], results[1]));
 
-                                    }
-
-                                    out.flush();
-                                    out.close();
-                                } catch (IOException e1) {
-                                    e1.printStackTrace();
-                                }
-                            } else {
-                                try {
-                                    String name = inputfile.getText().replaceAll(".txt", "out.txt");
-                                    String filename = String.format("%1$s%2$s%3$s.txt",
-                                            txtOutputfile.getText(), File.separator, name);
-                                    File outputfileName = new File(filename);
-                                    outputfileName.createNewFile(); // 创建新文件
-                                    BufferedWriter out = new BufferedWriter(new FileWriter(outputfileName));
-                                    out.write("chrId\t\t startLoci\t\t length\t\t CNmean\r\n");
-                                    myCore.CnSegment.splitChromosome(data, ratio, transformMethod);
-                                    for (Set<Segment> segments : myCore.CnSegment.getResult())
-                                        for (Segment seg : segments) {
-                                            out.write(String.format("%2d\t\t %6d\t\t %6d\t\t %.4f\n",
-                                                    seg.Chr_id, seg.range.Start, seg.length(), seg.CopyNumber));
-                                        }
-                                    out.flush();
-                                    out.close();
-                                } catch (IOException e1) {
-                                    e1.printStackTrace();
-                                }
-                            }
-                        }
+                        myCore.CnSegment.splitChromosome(chros, ratio, transformMethod, chkIsTestdata.isSelected());
                 }
             }
         });
@@ -416,7 +356,7 @@ public class Mainform {
 
                     for (SegmentCutter cutter : cutters) {
                         myCore.CnSegment.setCutter(cutter);
-                        myCore.CnSegment.splitChromosome(data, width, transformMethod);
+                        myCore.CnSegment.splitChromosome(data, width, transformMethod, chkIsTestdata.isSelected());
                         List<Set<Segment>> temp = myCore.CnSegment.resultclone();
                         // temp=myCore.CnSegment.getResult();
                         result.add(temp);
@@ -805,7 +745,65 @@ public class Mainform {
 
     }
 
-    private void createUIComponents() {
-        // TODO: place custom component creation code here
-    }
 }
+
+//{
+//        if (chkIsTestdata.isSelected()) {
+//        Date date = new Date();
+//        SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");
+//        String filename = String.format("data%1$sResult_%2$s.txt",
+//        File.separator, df.format(date));
+//        File output = new File(filename);
+//        try {
+//        output.createNewFile();
+//        BufferedWriter out = new BufferedWriter(new FileWriter(output));
+//        out.write("Method\t\t numberOfSeg\t\t foundSeg\t\t Tolerance\t\t truePoint\t\t segTime\t\t \r\n");
+//        for (int chr = 1; chr < data.size(); chr++) {
+//        if (data.get(chr).probes.size() == 0)
+//        continue;
+//        m_log.info(String.format("the %2d chro is splitting ", chr));
+//        long t1 = System.currentTimeMillis();
+//        Set<Segment> result = new TreeSet<Segment>();
+//        myCore.CnSegment.splitChromosome1(data.get(chr), result);
+//        long t2 = System.currentTimeMillis();
+//        m_log.info(String.format("Segmention time: %s ms", t2 - t1));
+//        String series = myCore.CnSegment.cutter.getMethodName();
+//        int totalchanges = data.get(chr).changepoints.size();
+//        for (int tolerance = 0; tolerance <= 50; tolerance = tolerance + 5) {
+//        int[] results = totalTP(data.get(chr), result, (long) tolerance);
+//        System.out.println(String.format("%6d\t\t\t %6d\n", results[0], results[1]));
+//        out.write(String.format("%20s\t\t %2d\t\t %2d\t\t %2d\t\t %2d\t\t %10d\n", series,
+//        totalchanges, result.size(), tolerance, results[0], t2 - t1));
+//        }
+//        int[] results = totalTP(data.get(chr), result, 15L);
+//        m_log.info(String.format("%6d\t\t\t %6d\n", results[0], results[1]));
+//
+//        }
+//
+//        out.flush();
+//        out.close();
+//        } catch (IOException e1) {
+//        e1.printStackTrace();
+//        }
+//        } else {
+//        try {
+//        String name = inputfile.getText().replaceAll(".txt", "out.txt");
+//        String filename = String.format("%1$s%2$s%3$s.txt",
+//        txtOutputfile.getText(), File.separator, name);
+//        File outputfileName = new File(filename);
+//        outputfileName.createNewFile(); // 创建新文件
+//        BufferedWriter out = new BufferedWriter(new FileWriter(outputfileName));
+//        out.write("chrId\t\t startLoci\t\t length\t\t CNmean\r\n");
+//        myCore.CnSegment.splitChromosome(data, ratio, transformMethod);
+//        for (Set<Segment> segments : myCore.CnSegment.getResult())
+//        for (Segment seg : segments) {
+//        out.write(String.format("%2d\t\t %6d\t\t %6d\t\t %.4f\n",
+//        seg.Chr_id, seg.range.Start, seg.length(), seg.CopyNumber));
+//        }
+//        out.flush();
+//        out.close();
+//        } catch (IOException e1) {
+//        e1.printStackTrace();
+//        }
+//        }
+//        }

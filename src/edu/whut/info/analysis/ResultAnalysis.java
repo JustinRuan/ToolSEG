@@ -1,10 +1,9 @@
 package edu.whut.info.analysis;
 
-import edu.whut.info.dataset.Result;
+import edu.whut.info.dataset.Segment;
+import edu.whut.info.util.BioToolbox;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -12,95 +11,213 @@ import java.util.logging.Logger;
  */
 public class ResultAnalysis {
     private Logger m_log;
-    private List<int[]> segRanges;
-    private List<Boolean> includeBpt;
-    private List<Double> values;
+
+    private List<Set<Segment>> correctSegs;
+    private List<Set<Segment>> results;
+    private List<Integer> lengths;
+
+    private double[] P;
+    private double[] N;
+    private double[] TP;
+    private double[] FP;
+
+    private List<Boolean> goldStandard;
+    private List<Double> testValues;
 
     public ResultAnalysis() {
         m_log = Logger.getLogger("segment");
-        segRanges = new ArrayList<>();
-        includeBpt = new ArrayList<>();
-        values = new ArrayList<>();
+        correctSegs = new LinkedList<>();
+        results = new LinkedList<>();
+        lengths = new LinkedList<>();
+
+        goldStandard = new LinkedList<>();
+        testValues = new LinkedList<>();
     }
 
-    private void clear(){
-        segRanges.clear();
-        includeBpt.clear();
-        values.clear();
+    public void clear(){
+        correctSegs.clear();
+        results.clear();
+        lengths.clear();
+        goldStandard.clear();
+        testValues.clear();
     }
 
-    public void initialize(List<Long> breakPoints, int chrLength){
-        final int Tolerance = 10;
-        clear();
+    public void addStandard(short chrId, double[] values, List<Long> breakPoints){
+        Set<Segment> tmpSet = new TreeSet<>();
 
         int begin,end;
         begin = 0;
         end = 0;
         for (long t : breakPoints) {
-            end = (int) t - 1 - Tolerance;
-            segRanges.add(new int[]{begin, end});
-            includeBpt.add(false);
-            values.add(0.);
-
-            begin = end;
-            end = (int) t - 1 + Tolerance;
-            segRanges.add(new int[]{begin,end});
-            includeBpt.add(true);
-            values.add(0.);
+            end = (int)t;
+            Segment seg = new Segment();
+            seg.setChr_id(chrId);
+            seg.setRange(begin, end);
+            BioToolbox.refreshSegment(seg, values);
+            tmpSet.add(seg);
 
             begin = end;
         }
 
         begin = end;
-        end = chrLength;
-        segRanges.add(new int[]{begin, end});
-        includeBpt.add(false);
-        values.add(0.);
+        end = values.length;
+        Segment seg = new Segment();
+        seg.setChr_id(chrId);
+        seg.setRange(begin, end);
+        BioToolbox.refreshSegment(seg, values);
+        tmpSet.add(seg);
 
+        correctSegs.add(tmpSet);
+        lengths.add(end);
     }
 
-    private final boolean isIncluded(Result value, int[] range){
-        if (value.isBreakPoint){
-            if (value.pos >= range[0] && value.pos < range[1]){
-                return true;
-            }else
-                return false;
-        }else{
-            //是否相交
-            if (range[0] < value.range[1] && range[1] > value.range[0]){
-                return true;
-            }else
-                return false;
+    public void addResult(Set<Segment> result){
+        results.add(result);
+    }
+
+    public void prepareTest(){
+        Iterator<Set<Segment>> itCorrSeg = correctSegs.iterator();
+        Iterator<Set<Segment>> itResult = results.iterator();
+        Iterator<Integer> itLength = lengths.iterator();
+
+        Random rnd = new Random(100);
+
+        while (itLength.hasNext()){
+            int len = itLength.next();
+            Set<Segment> corrSeg = itCorrSeg.next();
+            Set<Segment> result = itResult.next();
+
+            int pos = rnd.nextInt(20);
+            while (pos < len){
+                double trueValue = getValue(pos, corrSeg);
+                boolean tmpTrue = (Math.abs(trueValue - 2) < 0.02);
+                goldStandard.add(tmpTrue);
+
+                testValues.add(getValue(pos, result));
+
+                pos += 80 + rnd.nextInt(20);
+            }
         }
-
     }
 
-    public void analysisResult(List<Result> results, int chrid) {
-        int k = 0;
-        int count = segRanges.size();
+    private double getValue(int pos, Set<Segment> segments){
+        for (Segment seg : segments){
+            if (seg.isIncluded(pos)){
+                return seg.CopyNumber;
+            }
+        }
+        System.out.println("Error! getValue(int pos, Set<Segment> segments)");
+        return -1;
+    }
 
-        //判断结果落在什么区域，统计这个区域中最大Z值
-        for (int i = 0; i < count; i++) {
-            double maxV = 0;
-            int[] range = segRanges.get(i);
-            for (int j = 0; j < results.size(); j++) {
-                Result r = results.get(j);
-                if (isIncluded(r, range)) {
-                    maxV = r.value1 > maxV ? r.value1 : maxV;
+    public void analysisResult(){
+        //int sampleCount = goldStandard.size();
+        final int step = 20;
+        P = new double[step];
+        N = new double[step];
+        TP = new double[step];
+        FP = new double[step];
+
+        for (int k = 0; k < step; k++) {
+            double Tolerance = 0.001 + 0.0002 * k * k * k;
+            Iterator<Boolean> itTrue = goldStandard.iterator();
+            Iterator<Double> itValue = testValues.iterator();
+            while(itTrue.hasNext()){
+                boolean trueTag = itTrue.next();
+                double testValue = itValue.next();
+                boolean testTag = (Math.abs(testValue - 2) < Tolerance);
+
+                if (trueTag){
+                    P[k]++;
+                    if (testTag){
+                        TP[k]++;
+                    }
+                }else{
+                    N[k]++;
+                    if (testTag){
+                        FP[k]++;
+                    }
                 }
             }
-            values.set(i, maxV);
+
+            double fpr = FP[k]/N[k];
+            double tpr = TP[k]/P[k];
+            m_log.info(String.format("\t% 4d\t%f\t%f",k,fpr,tpr));
         }
-
-
-        for (int i = 0; i < segRanges.size(); i++){
-            // chr id, range[S, E], isBreak, value
-            int[] range = segRanges.get(i);
-            double z = values.get(i);
-
-            m_log.info(String.format("\t% 4d\t% 4d\t%d\t%s\t%f",
-                    chrid,range[0],range[1],includeBpt.get(i).toString(),z));
-        }
-
     }
+
+
 }
+//    public void initialize(List<Long> breakPoints, int chrLength, int Tolerance){
+//        clear();
+//
+//        int begin,end;
+//        begin = 0;
+//        end = 0;
+//        for (long t : breakPoints) {
+//            end = (int) t - 1 - Tolerance;
+//            segRanges.add(new int[]{begin, end});
+//            includeBpt.add(false);
+//            values.add(0.);
+//
+//            begin = end;
+//            end = (int) t - 1 + Tolerance;
+//            segRanges.add(new int[]{begin,end});
+//            includeBpt.add(true);
+//            values.add(0.);
+//
+//            begin = end;
+//        }
+//
+//        begin = end;
+//        end = chrLength;
+//        segRanges.add(new int[]{begin, end});
+//        includeBpt.add(false);
+//        values.add(0.);
+//
+//    }
+//
+//    private final boolean isIncluded(Result value, int[] range){
+//        if (value.isBreakPoint){
+//            if (value.pos >= range[0] && value.pos < range[1]){
+//                return true;
+//            }else
+//                return false;
+//        }else{
+//            //是否相交
+//            if (range[0] < value.range[1] && range[1] > value.range[0]){
+//                return true;
+//            }else
+//                return false;
+//        }
+//
+//    }
+//
+//    public void analysisResult(List<Result> results, int chrid) {
+//        int k = 0;
+//        int count = segRanges.size();
+//
+//        //判断结果落在什么区域，统计这个区域中最大Z值
+//        for (int i = 0; i < count; i++) {
+//            double maxV = 0;
+//            int[] range = segRanges.get(i);
+//            for (int j = 0; j < results.size(); j++) {
+//                Result r = results.get(j);
+//                if (isIncluded(r, range)) {
+//                    maxV = r.value1 > maxV ? r.value1 : maxV;
+//                }
+//            }
+//            values.set(i, maxV);
+//        }
+//
+//
+//        for (int i = 0; i < segRanges.size(); i++){
+//            // chr id, range[S, E], isBreak, value
+//            int[] range = segRanges.get(i);
+//            double z = values.get(i);
+//
+//            m_log.info(String.format("\t% 4d\t% 4d\t%d\t%s\t%f",
+//                    chrid,range[0],range[1],includeBpt.get(i).toString(),z));
+//        }
+//
+//    }
