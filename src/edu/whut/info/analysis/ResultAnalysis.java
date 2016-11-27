@@ -21,7 +21,7 @@ public class ResultAnalysis {
     private double[] TP;
     private double[] FP;
 
-    private List<Boolean> goldStandard;
+    private List<Double> goldStandard;
     private List<Double> testValues;
 
     public ResultAnalysis() {
@@ -90,12 +90,12 @@ public class ResultAnalysis {
             int pos = rnd.nextInt(20);
             while (pos < len){
                 double trueValue = getValue(pos, corrSeg);
-                boolean tmpTrue = (Math.abs(trueValue - 2) < 0.02);
-                goldStandard.add(tmpTrue);
+                //boolean tmpTrue = (Math.abs(trueValue - 2) < 0.02);
+                goldStandard.add(trueValue);
 
                 testValues.add(getValue(pos, result));
 
-                pos += 80 + rnd.nextInt(20);
+                pos += 1800 + rnd.nextInt(200);
             }
         }
     }
@@ -119,11 +119,12 @@ public class ResultAnalysis {
         FP = new double[step];
 
         for (int k = 0; k < step; k++) {
-            double Tolerance = 0.001 + 0.0002 * k * k * k;
-            Iterator<Boolean> itTrue = goldStandard.iterator();
+            double Tolerance = 0.0001 + 0.0001 * k * k * k;
+            Iterator<Double> itTrue = goldStandard.iterator();
             Iterator<Double> itValue = testValues.iterator();
             while(itTrue.hasNext()){
-                boolean trueTag = itTrue.next();
+                double trueValue = itTrue.next();
+                boolean trueTag = (Math.abs(trueValue - 2) < 0.02);
                 double testValue = itValue.next();
                 boolean testTag = (Math.abs(testValue - 2) < Tolerance);
 
@@ -145,8 +146,6 @@ public class ResultAnalysis {
             m_log.info(String.format("\t% 4d\t%f\t%f",k,fpr,tpr));
         }
     }
-
-
 }
 //    public void initialize(List<Long> breakPoints, int chrLength, int Tolerance){
 //        clear();
