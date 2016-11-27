@@ -34,7 +34,7 @@ public class PCFSegment implements SegmentCutter {
         input.CopyNumber = arr[0];
         input.stdCopyNumber = arr[1];
         input.setRange(0, data.length);
-        chromosome = data;
+        chromosome = data.clone();
         int IndexLength = data.length;
         ArrayList<Double> VectorA = new ArrayList<>(IndexLength);
         ArrayList<Double> VectorE = new ArrayList<>(IndexLength + 1);
@@ -44,7 +44,7 @@ public class PCFSegment implements SegmentCutter {
         List<Long> minIndex = new ArrayList<>(IndexLength);//VecortE ??????????????
         //int offset = MIN_SEG_LENGTH / MIN_SEG_STEP;
 
-        for (double a : data) {
+        for (double a : chromosome) {
 
             plus(VectorA, a);
             multiply(VectorA, VectorDk);
@@ -73,21 +73,10 @@ public class PCFSegment implements SegmentCutter {
 
         int i = 1;
         for (Segment seg : result) {
-            refreshSegment(seg);
+            BioToolbox.refreshSegment(seg, data);
             m_log.info(seg.getCharacterString());
             // m_log.info(String.format("the %2d segment:\t start=%6d\t end=%6d\t mean=%.4f\t std=%.4f", i, seg.range.Start,seg.range.End,seg.HalfCopyNumber,seg.stdHalfCopyNumber));
             i++;
-        }
-    }
-
-    public void refreshSegment(Segment seg) {
-        if (seg.isDirty) {
-            double[] ms;
-            ms = BioToolbox.robustMean(chromosome, seg.Start(), seg.End(), 16);
-            seg.CopyNumber = ms[0];
-            seg.stdCopyNumber = ms[1];
-
-            seg.isDirty = false;
         }
     }
 

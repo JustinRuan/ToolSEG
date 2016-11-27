@@ -36,9 +36,10 @@ public class FastPCF implements SegmentCutter {
         Segment input = new Segment();
         input.setChr_id(chrId);
         input.Seg_id = 0;
-        input.setRange(0, data.length);
+        input.setRange(0, chromosome.length);
+
         m_log.info(String.format("segment by %s", methodName));
-        ArrayList<Integer> candidates = highPassFiltering(data, winK, percent);
+        ArrayList<Integer> candidates = highPassFiltering(chromosome, winK, percent);
         List<Long> minIndex = new ArrayList<>();
         ArrayList<Double> arrAk = new ArrayList<>();
         ArrayList<Double> arrCk = new ArrayList<>();
@@ -51,7 +52,7 @@ public class FastPCF implements SegmentCutter {
         prior = candidates.get(0);
         for (int i = 1; i < candidates.size(); i++) {
             next = candidates.get(i);
-            uk.add(sum(data, prior, next));
+            uk.add(sum(chromosome, prior, next));
             prior = next;
         }
 
@@ -69,7 +70,7 @@ public class FastPCF implements SegmentCutter {
         }
 
         //output.add(input.getSubSegment(Candidates.get(start).intValue(), Length));
-        candidates.add(data.length);
+        candidates.add(chromosome.length);
         minIndex.add((long) (candidates.size() - 1));
 
         int start = minIndex.get(minIndex.size() - 2).intValue();
@@ -93,22 +94,23 @@ public class FastPCF implements SegmentCutter {
         }
         int i = 1;
         for (Segment seg : result) {
-            refreshSegment(seg);
+            BioToolbox.refreshSegment(seg,data);
+
             m_log.info(seg.getCharacterString());
             // m_log.info(String.format("the %2d segment:\t start=%6d\t end=%6d\t mean=%.4f\t std=%.4f", i, seg.range.Start,seg.range.End,seg.HalfCopyNumber,seg.stdHalfCopyNumber));
             i++;
         }
     }
 
-    public void refreshSegment(Segment seg) {
-        if (seg.isDirty) {
-            double[] ms;
-            ms = BioToolbox.robustMean(chromosome, seg.Start(), seg.End(), 16);
-            seg.CopyNumber = ms[0];
-            seg.stdCopyNumber = ms[1];
-            seg.isDirty = false;
-        }
-    }
+//    public void refreshSegment(Segment seg) {
+//        if (seg.isDirty) {
+//            double[] ms;
+//            ms = BioToolbox.robustMean(chromosome, seg.Start(), seg.End(), 0);
+//            seg.CopyNumber = ms[0];
+//            seg.stdCopyNumber = ms[1];
+//            seg.isDirty = false;
+//        }
+//    }
 
     @Override
     public String getMethodName() {
@@ -119,9 +121,7 @@ public class FastPCF implements SegmentCutter {
     public void prepareCopyNumberSegment(double[] data) {
         chromosome = new double[data.length];
         for (int i = 0; i < data.length; i++) {
-            chromosome[i] = data[i];
-            data[i] = BioToolbox.log2(data[i]);
-
+            chromosome[i] = BioToolbox.log2(data[i]);
         }
 
 

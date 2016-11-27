@@ -19,6 +19,7 @@ public class Segment implements Comparable<Segment>, Serializable {
     public GeneRange range;
     public boolean isReady;
     public boolean isDirty;
+
     public int getStart(){
         return  range.Start;
     }
@@ -79,18 +80,7 @@ public class Segment implements Comparable<Segment>, Serializable {
         newSeg.setRange(start, stop);
         return newSeg;
     }
-//    public Segment getSubSegment1(int start, int stop,double maxZ) {
-//        if (start == stop) {//调试用
-//            System.out.println("getSubSegment : Start == Stop!");
-//            System.exit(-1);
-//        }
-//        Segment newSeg = new Segment();
-//        newSeg.Seg_id = start;
-//        newSeg.setChr_id(this.Chr_id);
-//        newSeg.setRange(start, stop);
-//        newSeg.maxZ=maxZ;
-//        return newSeg;
-//    }
+
     public String getCharacterString() {
         return String.format("Seg_id = % 6d : %02d;[% 6d - % 6d]\t Length =% 6d;\t robustAvg = %.4f \t robustStd = %.4f",
                 Seg_id, Chr_id, Start(), End(), length(), CopyNumber, stdCopyNumber);
