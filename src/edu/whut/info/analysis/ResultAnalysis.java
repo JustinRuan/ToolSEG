@@ -15,7 +15,7 @@ public class ResultAnalysis {
     private List<Set<Segment>> correctSegs;
     private List<Set<Segment>> results;
     private List<Integer> lengths;
-
+    private List<List<Long>> breakPoints;
     private double[] P;
     private double[] N;
     private double[] TP;
@@ -29,7 +29,7 @@ public class ResultAnalysis {
         correctSegs = new LinkedList<>();
         results = new LinkedList<>();
         lengths = new LinkedList<>();
-
+        breakPoints=new ArrayList<>();
         goldStandard = new LinkedList<>();
         testValues = new LinkedList<>();
     }
@@ -40,6 +40,10 @@ public class ResultAnalysis {
         lengths.clear();
         goldStandard.clear();
         testValues.clear();
+    }
+
+    public void addBreakPoints(List<Long> breakPoints){
+        this.breakPoints.add(breakPoints);
     }
 
     public void addStandard(short chrId, double[] values, List<Long> breakPoints){
@@ -84,6 +88,54 @@ public class ResultAnalysis {
         Iterator<Set<Segment>> itCorrSeg = correctSegs.iterator();
         Iterator<Set<Segment>> itResult = results.iterator();
         Iterator<Integer> itLength = lengths.iterator();
+        for (int i=0;i<lengths.size();i++){
+            Set<Segment> corrSeg = itCorrSeg.next();
+            Set<Segment> result = itResult.next();
+                    for (Segment seg:corrSeg){
+                        int start=seg.Start();
+                        int end=seg.End();
+                        int step=2;
+                        while (step<=20){
+                            int pos=start+step;
+                            double trueValue = getValue(pos, corrSeg);
+                            //boolean tmpTrue = (Math.abs(trueValue - 2) < 0.02);
+                            if (start!=0){
+                                goldStandard.add(trueValue);
+                                testValues.add(getValue(pos, result));
+                            }
+                            pos=end-step;
+                            trueValue = getValue(pos, corrSeg);
+                    //boolean tmpTrue = (Math.abs(trueValue - 2) < 0.02);
+                            if (end!=lengths.get(i)){
+                            goldStandard.add(trueValue);
+                            testValues.add(getValue(pos, result));
+                            }
+                            step+=2;
+                }
+            }
+        }
+//        Random rnd = new Random(100);
+//
+//        while (itLength.hasNext()){
+//            int len = itLength.next();
+//            Set<Segment> corrSeg = itCorrSeg.next();
+//            Set<Segment> result = itResult.next();
+//
+//            int pos = rnd.nextInt(20);
+//            while (pos < len){
+//                double trueValue = getValue(pos, corrSeg);
+//                //boolean tmpTrue = (Math.abs(trueValue - 2) < 0.02);
+//                goldStandard.add(trueValue);
+//
+//                testValues.add(getValue(pos, result));
+//
+//                pos += 50 + rnd.nextInt(200);
+//            }
+        }
+    public void prepareTest1(){
+        Iterator<Set<Segment>> itCorrSeg = correctSegs.iterator();
+        Iterator<Set<Segment>> itResult = results.iterator();
+        Iterator<Integer> itLength = lengths.iterator();
 
         Random rnd = new Random(100);
 
@@ -100,7 +152,7 @@ public class ResultAnalysis {
 
                 testValues.add(getValue(pos, result));
 
-                pos += 800 + rnd.nextInt(200);
+                pos += 50 + rnd.nextInt(200);
             }
         }
     }
