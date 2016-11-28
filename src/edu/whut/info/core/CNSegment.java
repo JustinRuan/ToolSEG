@@ -108,7 +108,7 @@ public class CNSegment {
             chrIds.add(chros.get(i).chrId);
 
         ResultAnalysis RA = new ResultAnalysis();
-
+         isTest=true;
         for (int i = 0; i < nums; i++) {
             // printOriginalSegment(chros.get(i));
             long t1 = System.currentTimeMillis();
@@ -118,11 +118,10 @@ public class CNSegment {
 
             if (isTest) {//存储计算ROC曲线需要的数据
                 List<Long> breakPoints = chros.get(i).changepoints;
-
+                RA.addBreakPoints(breakPoints);
                 RA.addStandard(chrIds.get(i),cacheSample.get(i),breakPoints);
                 RA.addResult(result.get(i));
             }
-
         }
         //计算ROC曲线
         if (isTest){

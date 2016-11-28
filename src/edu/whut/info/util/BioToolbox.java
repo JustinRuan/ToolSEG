@@ -76,7 +76,7 @@ public class BioToolbox {
                 sum += d.doubleValue();
             }
 
-            return sum / len;
+            return sum /(len*1.0);
         } else
             return 0;
     }
@@ -133,7 +133,19 @@ public class BioToolbox {
         } else
             return 0;
     }
+    public static  double squareSum(double[] values) {
+        int len = values.length;
+        if (len > 0) {
+            double sum = 0;
+            double v;
+            for (double d : values) {
+                sum += d*d;
+            }
 
+            return sum;
+        } else
+            return 0;
+    }
     /**
      * Std double.
      *

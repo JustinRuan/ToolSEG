@@ -79,7 +79,7 @@ public class BCLT implements SegmentCutter {
         }
 
 
-        if (Show_Debug) {
+        if (true) {
             int i = 1;
             for (Segment seg : result) {
                 refreshSegment(seg);
@@ -258,7 +258,6 @@ public class BCLT implements SegmentCutter {
     }
 
     private void printZHistogram() {
-
         Histogram h = new Histogram(60, 0, 3);
         for (Map.Entry<Integer, Double> kv : zTree.zMap.entrySet()) {
             int id = kv.getKey();
@@ -267,7 +266,6 @@ public class BCLT implements SegmentCutter {
                 h.addDataPoint(z);
             }
         }
-
         m_log.info(h.toString("z Value"));
     }
 
@@ -357,7 +355,6 @@ public class BCLT implements SegmentCutter {
 
         public LinkedBinaryTreeNode<Integer> setRoot(Segment seg) {
             clear();
-
             mTreeRoot = new LinkedBinaryTreeNode<Integer>(1);
             segments.put(1, seg);
             return mTreeRoot;

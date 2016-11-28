@@ -17,11 +17,13 @@ public class CBSSegment implements SegmentCutter {
     private Logger m_log;
     private double[] chromosome;
     private double[] IntegralCN;
+    private List<Result> results;
 
     public CBSSegment(int MIN_SEG_LENGTH, int MIN_SEG_STEP) {
         this.MIN_SEG_LENGTH = MIN_SEG_LENGTH;
         this.MIN_SEG_STEP = MIN_SEG_STEP;
         m_log = Logger.getLogger("segment");
+        results=new LinkedList<>();
     }
 
     @Override
@@ -110,6 +112,21 @@ public class CBSSegment implements SegmentCutter {
             // m_log.info(String.format("the %2d segment:\t start=%6d\t end=%6d\t mean=%.4f\t std=%.4f", i, seg.range.Start,seg.range.End,seg.HalfCopyNumber,seg.stdHalfCopyNumber));
             i++;
         }
+        for (Segment seg:result){
+            Result rs=new Result();
+            rs.range=new int[]{seg.Start(),seg.End()};
+            rs.isBreakPoint=false;
+           // rs.value1=BioToolbox.mean(VectorE.subList(seg.Start(),seg.End()));
+            results.add(rs);
+            Result rs1=new Result();
+            rs1.range=null;
+            rs1.isBreakPoint=true;
+            rs1.pos=seg.End();
+          //  rs1.value1=VectorE.get(seg.End());
+            results.add(rs1);
+        }
+        results.remove(results.size()-1);
+
     }
 
     private void mergeSegment(Set<Segment> output, double threshold) {
