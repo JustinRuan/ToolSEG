@@ -94,8 +94,8 @@ public class ResultAnalysis {
                     for (Segment seg:corrSeg){
                         int start=seg.Start();
                         int end=seg.End();
-                        int step=2;
-                        while (step<=20){
+                        int step=5;
+                        while (step<=40){
                             int pos=start+step;
                             double trueValue = getValue(pos, corrSeg);
                             //boolean tmpTrue = (Math.abs(trueValue - 2) < 0.02);
@@ -110,7 +110,7 @@ public class ResultAnalysis {
                             goldStandard.add(trueValue);
                             testValues.add(getValue(pos, result));
                             }
-                            step+=2;
+                            step+=5;
                 }
             }
         }

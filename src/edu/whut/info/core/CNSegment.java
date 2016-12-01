@@ -112,6 +112,7 @@ public class CNSegment {
         for (int i = 0; i < nums; i++) {
             // printOriginalSegment(chros.get(i));
             long t1 = System.currentTimeMillis();
+            m_log.info(String.format("the %4d chro is splitting: ",i));
             cutter.splitChromosome(cacheSample.get(i), result.get(i), chrIds.get(i));
             long t2 = System.currentTimeMillis();
             //m_log.info(String.format("Time = %d ms", t2 - t1));

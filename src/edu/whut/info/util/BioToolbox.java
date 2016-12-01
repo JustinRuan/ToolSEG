@@ -724,14 +724,12 @@ public class BioToolbox {
         return result;
     }
     public static void refreshSegment(Segment seg,double[] chromosome) {
-        if (seg.isDirty) {
+
             double[] ms;
             ms = BioToolbox.robustMean(chromosome, seg.Start(), seg.End(), 0);
             seg.CopyNumber = ms[0];
             seg.stdCopyNumber = ms[1];
 
-            seg.isDirty = false;
-        }
     }
 
 
