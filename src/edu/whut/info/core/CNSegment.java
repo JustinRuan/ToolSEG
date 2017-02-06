@@ -87,6 +87,7 @@ public class CNSegment {
         double[] data=new double[chro.getLength()];
         for (int j=0;j<chro.getLength();j++)
             data[j]=chro.probes.get(j);
+        m_log.info("\n");
         for (Segment seg : result) {
             BioToolbox.refreshSegment(seg,data);
             m_log.info(seg.getCharacterString());
@@ -95,7 +96,10 @@ public class CNSegment {
     }
     public void splitChromosome(ArrayList<Chromosome> chros, double ratio, int method, boolean isTest) {
         result.clear();
-        //loading(chros);
+//        //100个点中取一个
+//        for (Chromosome chr : chros){
+//            chr.sampling();
+//        }
         preprocessing(chros, ratio, method);
 
         int nums = cacheSample.size();
@@ -108,15 +112,21 @@ public class CNSegment {
             chrIds.add(chros.get(i).chrId);
 
         ResultAnalysis RA = new ResultAnalysis();
-         isTest=true;
-        for (int i = 0; i < nums; i++) {
-            // printOriginalSegment(chros.get(i));
-            long t1 = System.currentTimeMillis();
-            m_log.info(String.format("the %4d chro is splitting: ",i));
-            cutter.splitChromosome(cacheSample.get(i), result.get(i), chrIds.get(i));
-            long t2 = System.currentTimeMillis();
-            //m_log.info(String.format("Time = %d ms", t2 - t1));
 
+        for (int i = 0; i < nums; i++) {
+            long t1 = 0, t2 = 0;
+            if (!isTest) {
+                printOriginalSegment(chros.get(i));
+                t1 = System.currentTimeMillis();
+            }
+
+            m_log.info(String.format("\n the %4d chro is splitting: ", i + 1));
+            cutter.splitChromosome(cacheSample.get(i), result.get(i), chrIds.get(i));
+
+            if (!isTest) {
+                t2 = System.currentTimeMillis();
+                m_log.info(String.format("Time = %d ms", t2 - t1));
+            }
             if (isTest) {//存储计算ROC曲线需要的数据
                 List<Long> breakPoints = chros.get(i).changepoints;
                 RA.addBreakPoints(breakPoints);
@@ -128,12 +138,14 @@ public class CNSegment {
         if (isTest){
             RA.prepareTest();
             RA.analysisResult();
+
+            RA.correctSegStatistics();
         }
 
-        //画出分段结果
-        //drawProbeSets(chros, result, method);
-
-
+        if (!isTest) {
+            //画出分段结果
+            drawProbeSets(chros, result, method);
+        }
         //只分一段
         //    cutter.splitChromosome(cacheSample.get(1),result.get(1),chrIds.get(1));
         // drawChromosome(chros.get(2),result.get(1),30);

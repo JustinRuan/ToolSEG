@@ -45,4 +45,32 @@ public class Chromosome implements Serializable {
         probes = ps;
     }
 
+    public void sampling(){
+        List<Double> newProbes = new ArrayList<>();
+        List<Long> newCpts = new ArrayList<>();
+        for (int i = 0; i < probes.size();i++){
+            if (i % 100 == 0){
+                newProbes.add(probes.get(i));
+            }
+        }
+        for (Long pos : changepoints){
+            if (pos > 100){
+                if (newCpts.size() > 0){
+                    Long last = newCpts.get(newCpts.size()-1);
+                    Long current = pos /100;
+
+                    if (current - last > 3){
+                        newCpts.add(current);
+                    }
+                }else{
+                    newCpts.add(pos/100);
+                }
+            }
+
+        }
+        probes = newProbes;
+        changepoints = newCpts;
+    }
+
+
 }

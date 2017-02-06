@@ -12,7 +12,7 @@ import java.util.logging.Logger;
  */
 public class CBSSegment implements SegmentCutter {
     private int MIN_SEG_LENGTH;
-    private int MIN_SEG_STEP = 8;
+    private int MIN_SEG_STEP = 2;
     private String name = "CBSegmentCutter";
     private Logger m_log;
     private double[] chromosome;
@@ -88,7 +88,7 @@ public class CBSSegment implements SegmentCutter {
                 // getThresh(curSeg);
                 double splittingThreshold = getPValue(curSeg, maxZ);
                 // if (maxZ > curSeg.splittingThreshold)
-                if (splittingThreshold <= 0.01) {//splitting
+                if (splittingThreshold <= 0.1) {//splitting
                     List<Segment> newSegs = new LinkedList<Segment>();
                     if ((Stop < Start) || (Stop == Start)) {//debug info
                         System.out.println("splitChromosome Error!");
@@ -105,7 +105,7 @@ public class CBSSegment implements SegmentCutter {
                 }
             }
         }
-        mergeSegment(result, 0.2);
+        mergeSegment(result, 0.05);
         int i = 1;
         for (Segment seg : result) {
             BioToolbox.refreshSegment(seg,data);

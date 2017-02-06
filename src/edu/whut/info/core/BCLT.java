@@ -31,7 +31,7 @@ public class BCLT implements SegmentCutter {
     private SegTree zTree;
 
     private double[] diff;
-    private final boolean Show_Debug = false;
+    private final boolean Show_Debug = true;
 
     public BCLT(double pvalueThre, int minSegLen, double lambda) {
         m_log = Logger.getLogger("segment");
@@ -96,7 +96,7 @@ public class BCLT implements SegmentCutter {
             m_log.info(String.format("final thresh of Z = %.4f", thresh));
         }
         for (Map.Entry<Integer, Double> kv : zTree.zMap.entrySet()) {
-            if (kv.getValue() > thresh) {
+            if (kv.getValue() > thresh + LAMBDA) {
                 breakPositions.add(zTree.breakPositions.get(kv.getKey()));
             }
         }
@@ -137,8 +137,10 @@ public class BCLT implements SegmentCutter {
             sum += data[j];
             IntegralCN[j + 1] = sum;
         }
-        robustSTD = Math.max(0.01,getRobustStd() + LAMBDA) ;
-        if (Show_Debug) m_log.info(String.format("Revised Robust Std = %f, LAMBDA = %.3f", robustSTD, LAMBDA));
+        //robustSTD = Math.max(0.01,getRobustStd() + LAMBDA) ;
+        double temp = getRobustStd();
+        robustSTD = temp + 0.02;
+        if (Show_Debug) m_log.info(String.format("Revised Robust Std = %f, robustSTD = %.3f", robustSTD, temp));
     }
 
     private double getRobustStd() {
@@ -174,16 +176,34 @@ public class BCLT implements SegmentCutter {
         int maxPos = 0;
         double z1, z2, z3;
 
-        if (input.length() <= MIN_SEG_LENGTH) {
+        if (input.length() < MIN_SEG_LENGTH) {
             //分段完成
             input.isReady = true;
             output.add(input);
-            zTree.setZValue(parent, input.stdCopyNumber);
+
+            //并没有实际意义的计算，只是为了输出一个Z值
+            for (int j = input.Start() + 1; j < input.End() - 1; j++) {
+                //如果过于接近整个段,就忽略
+
+                z1 = calculateZ(input, input.Start(), j);
+                z2 = calculateZ(input, j, input.End());
+
+                z3 = Math.pow(Math.sqrt(Math.abs(z1)) + Math.sqrt(Math.abs(z2)), 2.0);
+
+                if (z3 > maxZsearch) {
+                    maxZ = Math.max(Math.abs(z1), Math.abs(z2));
+                    maxZsearch = z3;
+                }
+            }
+            //没有意义的代码结束了！！！
+
+            zTree.setZValue(parent, maxZ);
             zTree.setBreakPosition(parent, -1, 'C');
             return;
         }
 
-        for (int j = input.Start() + MIN_SEG_LENGTH; j < input.End() - MIN_SEG_LENGTH; j++) {
+        for (int j = input.Start() + 1; j < input.End() - 1; j++) {
+        //for (int j = input.Start() + MIN_SEG_LENGTH; j < input.End() - MIN_SEG_LENGTH; j++) {
             //如果过于接近整个段,就忽略
 
             z1 = calculateZ(input, input.Start(), j);
@@ -213,6 +233,7 @@ public class BCLT implements SegmentCutter {
 
             maxZsearch = 0;
             for (int width : winSet) {
+                //for (int j = input.Start() + 1; j < input.End() - 1; j++) {
                 for (int j = input.Start() + MIN_SEG_LENGTH; j < input.End() - MIN_SEG_LENGTH; j++) {
                     //如果过于接近整个段,就忽略
                     int left = Math.max(input.Start(), j - width);
@@ -230,16 +251,23 @@ public class BCLT implements SegmentCutter {
                 }
             }
         }
-        if (maxZ > 0) {
-            zTree.setZValue(parent, maxZ);
-            zTree.setBreakPosition(parent, maxPos, windowModel);
-        } else {
-            zTree.setZValue(parent, input.stdCopyNumber);
+//        if (maxZ > 0) {
+//            zTree.setZValue(parent, maxZ);
+//            zTree.setBreakPosition(parent, maxPos, windowModel);
+//        } else {
+//            zTree.setZValue(parent, input.stdCopyNumber);
+//            zTree.setBreakPosition(parent, -1, 'C');
+//        }
+        if (maxZ <= 0) {
+            zTree.setZValue(parent, 0);
             zTree.setBreakPosition(parent, -1, 'C');
         }
 
+        if (maxZ > robustSTD && maxPos > 0 ) {
+            zTree.setZValue(parent, maxZ);
+            zTree.setBreakPosition(parent, maxPos, windowModel);
 
-        if (maxZ > robustSTD && maxPos > 0) {
+
             int newBreak = maxPos;
             //二分
             Segment front = input.getSubSegment(input.Start(), newBreak);
@@ -254,6 +282,9 @@ public class BCLT implements SegmentCutter {
             //分段完成
             input.isReady = true;
             output.add(input);
+
+            zTree.setZValue(parent, maxZ);
+            zTree.setBreakPosition(parent, maxPos, windowModel);
         }
     }
 
@@ -465,11 +496,12 @@ public class BCLT implements SegmentCutter {
                 public void visit(BinaryTreeNode node) {
                     double z = zMap.get(node.getData());
                     int type = breakType.get(node.getData());
+                    double std = segments.get(node.getData()).stdCopyNumber;
 
                     if (node.getLeft() != null && node.getRight() != null) {
                         result[0] = (z < result[0]) ? z : result[0];//非叶子节点
                     } else {//叶子节点
-                        result[1] = (z > result[1]) ? z : result[1];
+                        result[1] = (std > result[1]) ? std : result[1];
                     }
                 }
             });
@@ -508,14 +540,15 @@ public class BCLT implements SegmentCutter {
 
                     int id = (int) node.getData();
                     double z = zMap.get(id);
-                    double rate = calculateRate(node);
+                    //double rate = calculateRate(node);
+                    double std = segments.get(id).stdCopyNumber;
                     int tm = breakType.get(id);
 
                     if (node.getRight() == null || node.getLeft() == null) {
                         startpos = segments.get(node.getData()).Start();
                         endpos = segments.get(node.getData()).End();
                         result.append(String.format("Seg: %4d = (XXXX:XXXX) <% 8d><--------><% 8d> (id,z,r) = (% 4d,%.4f,%+1.4f)[%c]%s",
-                                node.getData(), startpos, endpos, node.getData(), z, rate, tm, zString.get(node.getData())));
+                                node.getData(), startpos, endpos, node.getData(), z, std, tm, zString.get(node.getData())));
                     } else {
                         leftid = (Integer) node.getLeft().getData();
                         rightid = (Integer) node.getRight().getData();
@@ -523,7 +556,7 @@ public class BCLT implements SegmentCutter {
                         startpos = segments.get(node.getData()).Start();
                         endpos = segments.get(node.getData()).End();
                         result.append(String.format("Seg: %4d = (% 4d:% 4d) <% 8d><% 8d><% 8d> (id,z,r) = (% 4d,%.4f,%+1.4f)[%c]%s",
-                                node.getData(), leftid, rightid, startpos, breakpos, endpos, node.getData(), z, rate, tm, zString.get(node.getData())));
+                                node.getData(), leftid, rightid, startpos, breakpos, endpos, node.getData(), z, std, tm, zString.get(node.getData())));
                     }
 
                     result.append('\n');

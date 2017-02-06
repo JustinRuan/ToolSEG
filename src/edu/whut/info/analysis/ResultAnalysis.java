@@ -29,12 +29,12 @@ public class ResultAnalysis {
         correctSegs = new LinkedList<>();
         results = new LinkedList<>();
         lengths = new LinkedList<>();
-        breakPoints=new ArrayList<>();
+        breakPoints = new ArrayList<>();
         goldStandard = new LinkedList<>();
         testValues = new LinkedList<>();
     }
 
-    public void clear(){
+    public void clear() {
         correctSegs.clear();
         results.clear();
         lengths.clear();
@@ -42,18 +42,18 @@ public class ResultAnalysis {
         testValues.clear();
     }
 
-    public void addBreakPoints(List<Long> breakPoints){
+    public void addBreakPoints(List<Long> breakPoints) {
         this.breakPoints.add(breakPoints);
     }
 
-    public void addStandard(short chrId, double[] values, List<Long> breakPoints){
+    public void addStandard(short chrId, double[] values, List<Long> breakPoints) {
         Set<Segment> tmpSet = new TreeSet<>();
 
-        int begin,end;
+        int begin, end;
         begin = 0;
         end = 0;
         for (long t : breakPoints) {
-            end = (int)t;
+            end = (int) t;
             Segment seg = new Segment();
             seg.setChr_id(chrId);
             seg.setRange(begin, end);
@@ -75,7 +75,7 @@ public class ResultAnalysis {
         lengths.add(end);
     }
 
-    public void addResult(Set<Segment> result){
+    public void addResult(Set<Segment> result) {
 //        for (Segment seg : result){
 //            if (seg.isLog2){
 //                seg.CopyNumber = Math.pow(2,seg.CopyNumber);
@@ -84,33 +84,33 @@ public class ResultAnalysis {
         results.add(result);
     }
 
-    public void prepareTest(){
+    public void prepareTest() {
         Iterator<Set<Segment>> itCorrSeg = correctSegs.iterator();
         Iterator<Set<Segment>> itResult = results.iterator();
         Iterator<Integer> itLength = lengths.iterator();
-        for (int i=0;i<lengths.size();i++){
+        for (int i = 0; i < lengths.size(); i++) {
             Set<Segment> corrSeg = itCorrSeg.next();
             Set<Segment> result = itResult.next();
-                    for (Segment seg:corrSeg){
-                        int start=seg.Start();
-                        int end=seg.End();
-                        int step=5;
-                        while (step<=40){
-                            int pos=start+step;
-                            double trueValue = getValue(pos, corrSeg);
-                            //boolean tmpTrue = (Math.abs(trueValue - 2) < 0.02);
-                            if (start!=0){
-                                goldStandard.add(trueValue);
-                                testValues.add(getValue(pos, result));
-                            }
-                            pos=end-step;
-                            trueValue = getValue(pos, corrSeg);
+            for (Segment seg : corrSeg) {
+                int start = seg.Start();
+                int end = seg.End();
+                int step = 5;
+                while (step <= 20) {
+                    int pos = start + step;
+                    double trueValue = getValue(pos, corrSeg);
                     //boolean tmpTrue = (Math.abs(trueValue - 2) < 0.02);
-                            if (end!=lengths.get(i)){
-                            goldStandard.add(trueValue);
-                            testValues.add(getValue(pos, result));
-                            }
-                            step+=5;
+                    if (start != 0) {
+                        goldStandard.add(trueValue);
+                        testValues.add(getValue(pos, result));
+                    }
+                    pos = end - step;
+                    trueValue = getValue(pos, corrSeg);
+                    //boolean tmpTrue = (Math.abs(trueValue - 2) < 0.02);
+                    if (end != lengths.get(i)) {
+                        goldStandard.add(trueValue);
+                        testValues.add(getValue(pos, result));
+                    }
+                    step += 5;
                 }
             }
         }
@@ -131,21 +131,22 @@ public class ResultAnalysis {
 //
 //                pos += 50 + rnd.nextInt(200);
 //            }
-        }
-    public void prepareTest1(){
+    }
+
+    public void prepareTest1() {
         Iterator<Set<Segment>> itCorrSeg = correctSegs.iterator();
         Iterator<Set<Segment>> itResult = results.iterator();
         Iterator<Integer> itLength = lengths.iterator();
 
         Random rnd = new Random(100);
 
-        while (itLength.hasNext()){
+        while (itLength.hasNext()) {
             int len = itLength.next();
             Set<Segment> corrSeg = itCorrSeg.next();
             Set<Segment> result = itResult.next();
 
             int pos = rnd.nextInt(20);
-            while (pos < len){
+            while (pos < len) {
                 double trueValue = getValue(pos, corrSeg);
                 //boolean tmpTrue = (Math.abs(trueValue - 2) < 0.02);
                 goldStandard.add(trueValue);
@@ -157,9 +158,9 @@ public class ResultAnalysis {
         }
     }
 
-    private double getValue(int pos, Set<Segment> segments){
-        for (Segment seg : segments){
-            if (seg.isIncluded(pos)){
+    private double getValue(int pos, Set<Segment> segments) {
+        for (Segment seg : segments) {
+            if (seg.isIncluded(pos)) {
                 return seg.CopyNumber;
             }
         }
@@ -167,7 +168,7 @@ public class ResultAnalysis {
         return -1;
     }
 
-    public void analysisResult(){
+    public void analysisResult() {
         //int sampleCount = goldStandard.size();
         final int step = 20;
         P = new double[step];
@@ -175,12 +176,14 @@ public class ResultAnalysis {
         TP = new double[step];
         FP = new double[step];
 
+        m_log.info(String.format("\n......Roc date ......\n"));
+
         for (int k = 0; k < step; k++) {
             double Tolerance = 0.0001 + 0.0001 * k * k * k;
 
             Iterator<Double> itTrue = goldStandard.iterator();
             Iterator<Double> itValue = testValues.iterator();
-            while(itTrue.hasNext()){
+            while (itTrue.hasNext()) {
                 double trueValue, testValue;
                 trueValue = itTrue.next();
                 testValue = itValue.next();
@@ -188,23 +191,41 @@ public class ResultAnalysis {
                 boolean trueTag = (Math.abs(trueValue - 2) < 0.05);
                 boolean testTag = (Math.abs(testValue - 2) < Tolerance);
 
-                if (trueTag){
+                if (trueTag) {
                     P[k]++;
-                    if (testTag){
+                    if (testTag) {
                         TP[k]++;
                     }
-                }else{
+                } else {
                     N[k]++;
-                    if (testTag){
+                    if (testTag) {
                         FP[k]++;
                     }
                 }
             }
 
-            double fpr = FP[k]/N[k];
-            double tpr = TP[k]/P[k];
-            m_log.info(String.format("\t% 4d\t%f\t%f",k,fpr,tpr));
+            double fpr = FP[k] / N[k];
+            double tpr = TP[k] / P[k];
+            m_log.info(String.format("\t% 4d\t%f\t%f", k, fpr, tpr));
         }
+    }
+
+    public void correctSegStatistics(){
+        m_log.info(String.format("\n......correctSegs Statistics ......sample count = %d \n ",
+                correctSegs.size()));
+
+        int count = 0;
+        StringBuilder result = new StringBuilder();
+        for (Set<Segment> setSeg : correctSegs){
+            count += setSeg.size();
+            for (Segment seg :setSeg){
+                result.append(String.format("\t%.4f\t%.4f\t%d\n",seg.CopyNumber,seg.stdCopyNumber,seg.length()));
+            }
+        }
+
+        m_log.info(String.format("\n. Segment count = %d \n ",count));
+        m_log.info("\n" + result.toString());
+
     }
 }
 //    public void initialize(List<Long> breakPoints, int chrLength, int Tolerance){

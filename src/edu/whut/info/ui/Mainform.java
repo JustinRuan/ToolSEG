@@ -99,6 +99,7 @@ public class Mainform {
     private JRadioButton power2RadioButton;
     private JTextField BCLTLambdatxt;
     private JCheckBox chkIsMultiFiles;
+    private JTextField DBSLimittxt;
     private Logger m_log;
 
     private int transformMethod;
@@ -138,7 +139,7 @@ public class Mainform {
         //BCLT params
         BCLTLengtxt.setText("50");
         BCLTpvaluetxt.setText("0.05");
-        BCLTLambdatxt.setText("0.1");
+        BCLTLambdatxt.setText("0.02");
 
         //preprocess
         outliertxt.setText("2.5");
