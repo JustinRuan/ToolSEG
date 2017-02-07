@@ -139,7 +139,7 @@ public class CNSegment {
             RA.prepareTest();
             RA.analysisResult();
 
-            RA.correctSegStatistics();
+            //RA.correctSegStatistics();
         }
 
         if (!isTest) {

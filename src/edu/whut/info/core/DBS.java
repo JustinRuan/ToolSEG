@@ -17,11 +17,11 @@ import java.util.logging.Logger;
  * Version : 23
  */
 //Central limit theorem
-public class BCLT implements SegmentCutter {
+public class DBS implements SegmentCutter {
     private double PVALUE_THRESH = 0.05;
     private int MIN_SEG_LENGTH = 200;
     private double LAMBDA = 0.1;
-    private String methodname = "BCLT";
+    private String methodname = "DBS";
     private double[] chromosome;
     private Logger m_log;
     private double[] IntegralCN;
@@ -31,9 +31,9 @@ public class BCLT implements SegmentCutter {
     private SegTree zTree;
 
     private double[] diff;
-    private final boolean Show_Debug = true;
+    private final boolean Show_Debug = false;
 
-    public BCLT(double pvalueThre, int minSegLen, double lambda) {
+    public DBS(double pvalueThre, int minSegLen, double lambda) {
         m_log = Logger.getLogger("segment");
 
         this.PVALUE_THRESH = pvalueThre;
@@ -79,7 +79,7 @@ public class BCLT implements SegmentCutter {
         }
 
 
-        if (true) {
+        if (Show_Debug) {
             int i = 1;
             for (Segment seg : result) {
                 refreshSegment(seg);
@@ -297,7 +297,7 @@ public class BCLT implements SegmentCutter {
                 h.addDataPoint(z);
             }
         }
-        m_log.info(h.toString("z Value"));
+        if (Show_Debug) m_log.info(h.toString("z Value"));
     }
 
     private void save2File(double[][] data, int length) {

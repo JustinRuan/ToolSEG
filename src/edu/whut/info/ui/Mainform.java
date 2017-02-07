@@ -136,7 +136,7 @@ public class Mainform {
         center.setText("8");
         gama.setText("20");
 
-        //BCLT params
+        //DBS params
         BCLTLengtxt.setText("50");
         BCLTpvaluetxt.setText("0.05");
         BCLTLambdatxt.setText("0.02");
@@ -238,7 +238,7 @@ public class Mainform {
                         length = Integer.valueOf(BCLTLengtxt.getText());
                         p = Double.valueOf(BCLTpvaluetxt.getText());
                         double lambda = Double.valueOf(BCLTLambdatxt.getText());
-                        cutterAlgorithm = new BCLT(p, length, lambda);
+                        cutterAlgorithm = new DBS(p, length, lambda);
                         break;
                 }
 
