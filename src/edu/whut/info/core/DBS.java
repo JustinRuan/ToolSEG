@@ -18,6 +18,7 @@ import java.util.logging.Logger;
  */
 //Central limit theorem
 public class DBS implements SegmentCutter {
+    private final boolean Show_Debug = false;
     private double PVALUE_THRESH = 0.05;
     private int MIN_SEG_LENGTH = 200;
     private double LAMBDA = 0.1;
@@ -31,8 +32,6 @@ public class DBS implements SegmentCutter {
     private SegTree zTree;
 
     private double[] diff;
-    private final boolean Show_Debug = false;
-
     public DBS(double pvalueThre, int minSegLen, double lambda) {
         m_log = Logger.getLogger("segment");
 
@@ -43,10 +42,14 @@ public class DBS implements SegmentCutter {
         zTree = new SegTree();
     }
 
+    public String getMethodname() {
+        return methodname;
+    }
+
     @Override
     public void splitChromosome(double[] data, Set<Segment> result, short Chr_id) {
         zTree.clear();
-        if (Show_Debug) m_log.info(String.format("segment by %s", methodname));
+        //m_log.info(String.format("segment by %s", methodname));
         chromosome = data;
         prepareCopyNumberSegment(data);
 
@@ -117,7 +120,7 @@ public class DBS implements SegmentCutter {
             }
             start = end;
         }
-        output.clear();;
+        output.clear();
         output.addAll(temp);
 }
 
@@ -155,6 +158,7 @@ public class DBS implements SegmentCutter {
 
             Arrays.parallelSort(df);
             final double limit = 0.01;
+            //final double limit = 0.5/2;
             double[] ap = Arrays.copyOfRange(df, (int) (limit * count), (int) ((1 - limit) * count));
             double[] temp = BioToolbox.mean_std(ap);
             double std = temp[1] / Math.sqrt(2.0);
@@ -202,7 +206,7 @@ public class DBS implements SegmentCutter {
             return;
         }
 
-        for (int j = input.Start() + 1; j < input.End() - 1; j++) {
+        for (int j = input.Start() + 20; j < input.End() - 20; j++) {
         //for (int j = input.Start() + MIN_SEG_LENGTH; j < input.End() - MIN_SEG_LENGTH; j++) {
             //如果过于接近整个段,就忽略
 

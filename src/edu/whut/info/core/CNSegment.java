@@ -3,10 +3,8 @@ package edu.whut.info.core;
 import com.google.common.primitives.Doubles;
 import edu.whut.info.analysis.ResultAnalysis;
 import edu.whut.info.dataset.Chromosome;
-import edu.whut.info.dataset.Result;
 import edu.whut.info.dataset.Segment;
 import edu.whut.info.util.BioToolbox;
-import org.apache.commons.math3.analysis.function.Max;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -93,6 +91,7 @@ public class CNSegment {
             m_log.info(seg.getCharacterString());
             i++;
         }
+        m_log.info("\n");
     }
     public void splitChromosome(ArrayList<Chromosome> chros, double ratio, int method, boolean isTest) {
         result.clear();
@@ -117,16 +116,16 @@ public class CNSegment {
             long t1 = 0, t2 = 0;
             if (!isTest) {
                 printOriginalSegment(chros.get(i));
-                t1 = System.currentTimeMillis();
             }
 
-            m_log.info(String.format("\n the %4d chro is splitting: ", i + 1));
+            t1 = System.currentTimeMillis();
             cutter.splitChromosome(cacheSample.get(i), result.get(i), chrIds.get(i));
+            t2 = System.currentTimeMillis();
 
-            if (!isTest) {
-                t2 = System.currentTimeMillis();
-                m_log.info(String.format("Time = %d ms", t2 - t1));
-            }
+            long tt = t2 - t1;
+            m_log.info(String.format("%s: the %4d chro is split: \t< Length,Time(ms)> = \t%d \t%d",
+                    cutter.getMethodName(), i + 1, cacheSample.get(i).length, tt));
+
             if (isTest) {//存储计算ROC曲线需要的数据
                 List<Long> breakPoints = chros.get(i).changepoints;
                 RA.addBreakPoints(breakPoints);

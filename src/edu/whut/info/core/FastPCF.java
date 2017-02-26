@@ -11,6 +11,7 @@ import java.util.logging.Logger;
  * Created by Liu on 2016/3/21.
  */
 public class FastPCF implements SegmentCutter {
+    private final boolean Show_Debug = false;
     private int winK;
     private double penaltyR;
     private Logger m_log;
@@ -38,7 +39,7 @@ public class FastPCF implements SegmentCutter {
         input.Seg_id = 0;
         input.setRange(0, chromosome.length);
 
-        m_log.info(String.format("segment by %s", methodName));
+        //m_log.info(String.format("segment by %s", methodName));
         ArrayList<Integer> candidates = highPassFiltering(chromosome, winK, percent);
         List<Long> minIndex = new ArrayList<>();
         ArrayList<Double> arrAk = new ArrayList<>();
@@ -96,7 +97,7 @@ public class FastPCF implements SegmentCutter {
         for (Segment seg : result) {
             BioToolbox.refreshSegment(seg,data);
 
-            m_log.info(seg.getCharacterString());
+            if (Show_Debug) m_log.info(seg.getCharacterString());
             // m_log.info(String.format("the %2d segment:\t start=%6d\t end=%6d\t mean=%.4f\t std=%.4f", i, seg.range.Start,seg.range.End,seg.HalfCopyNumber,seg.stdHalfCopyNumber));
             i++;
         }

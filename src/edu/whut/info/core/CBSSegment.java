@@ -11,6 +11,7 @@ import java.util.logging.Logger;
  * Created by Liu on 2016/3/21.
  */
 public class CBSSegment implements SegmentCutter {
+    private final boolean Show_Debug = false;
     private int MIN_SEG_LENGTH;
     private int MIN_SEG_STEP = 2;
     private String name = "CBSegmentCutter";
@@ -28,7 +29,7 @@ public class CBSSegment implements SegmentCutter {
 
     @Override
     public void splitChromosome(double[] data, Set<Segment> result, short chrId) {
-        m_log.info(String.format("segment by %s", name));
+        //m_log.info(String.format("segment by %s", name));
         //chromosome=data;
         prepareCopyNumberSegment(data);
         Segment input = new Segment();
@@ -41,20 +42,23 @@ public class CBSSegment implements SegmentCutter {
         Queue<Segment> splittingSegments = new LinkedList<Segment>();
         //splittingSegments.add(input);
         int totLength = data.length;//
-        int K = totLength / 2000;
+        final int L = 100000;//2000
+        int K = totLength / L;
         int temp = 0;
         ArrayList<Long> potentials = new ArrayList<>();
         for (int k = 0; k < K; k++) {
-            Segment seg = input.getSubSegment(temp, temp + 2000);
+            Segment seg = input.getSubSegment(temp, temp + L);
             splittingSegments.add(seg);
-            temp += 2000;
+            temp += L;
         }
         if (temp != totLength)
             splittingSegments.add(input.getSubSegment(temp, totLength));
         List<Integer> Index = new ArrayList<Integer>();
         while (!splittingSegments.isEmpty()) {
             Segment curSeg = splittingSegments.poll();
-            refreshSegment(curSeg,chromosome);
+            //refreshSegment(curSeg,chromosome);
+            BioToolbox.refreshSegment(curSeg, chromosome);
+
             int segLength = curSeg.length();
             double maxZ = 0.;
             int Start = 0, Stop = 0;
@@ -105,28 +109,29 @@ public class CBSSegment implements SegmentCutter {
                 }
             }
         }
-        mergeSegment(result, 0.05);
+        mergeSegment(result, 0.2);
         int i = 1;
         for (Segment seg : result) {
+            seg.isDirty = true;
             BioToolbox.refreshSegment(seg,data);
-            m_log.info(seg.getCharacterString());
+            if (Show_Debug) m_log.info(seg.getCharacterString());
             // m_log.info(String.format("the %2d segment:\t start=%6d\t end=%6d\t mean=%.4f\t std=%.4f", i, seg.range.Start,seg.range.End,seg.HalfCopyNumber,seg.stdHalfCopyNumber));
             i++;
         }
-        for (Segment seg:result){
-            Result rs=new Result();
-            rs.range=new int[]{seg.Start(),seg.End()};
-            rs.isBreakPoint=false;
-           // rs.value1=BioToolbox.mean(VectorE.subList(seg.Start(),seg.End()));
-            results.add(rs);
-            Result rs1=new Result();
-            rs1.range=null;
-            rs1.isBreakPoint=true;
-            rs1.pos=seg.End();
-          //  rs1.value1=VectorE.get(seg.End());
-            results.add(rs1);
-        }
-        results.remove(results.size()-1);
+//        for (Segment seg:result){
+//            Result rs=new Result();
+//            rs.range=new int[]{seg.Start(),seg.End()};
+//            rs.isBreakPoint=false;
+//           // rs.value1=BioToolbox.mean(VectorE.subList(seg.Start(),seg.End()));
+//            results.add(rs);
+//            Result rs1=new Result();
+//            rs1.range=null;
+//            rs1.isBreakPoint=true;
+//            rs1.pos=seg.End();
+//          //  rs1.value1=VectorE.get(seg.End());
+//            results.add(rs1);
+//        }
+//        results.remove(results.size()-1);
 
     }
 
@@ -136,8 +141,10 @@ public class CBSSegment implements SegmentCutter {
         Segment preSegment = it.next();
         while (it.hasNext()) {
             Segment nextSegment = it.next();
-            refreshSegment(preSegment,chromosome);
-            refreshSegment(nextSegment,chromosome);
+//            refreshSegment(preSegment,chromosome);
+//            refreshSegment(nextSegment,chromosome);
+            BioToolbox.refreshSegment(preSegment, chromosome);
+            BioToolbox.refreshSegment(preSegment, chromosome);
             if (Math.abs(preSegment.CopyNumber - nextSegment.CopyNumber) <= threshold) {
                 preSegment.setRange(preSegment.Start(), nextSegment.End());
             } else {
@@ -278,9 +285,8 @@ public class CBSSegment implements SegmentCutter {
         IntegralCN[0] = 0.0;
         double sum = 0;
         for (int j = 0; j < length; j++) {
-//            chromosome[j] = data[j];
-//            data[j] = BioToolbox.log2(data[j]);
-            chromosome[j]=BioToolbox.log2(data[j]);
+            chromosome[j] = data[j];
+            //chromosome[j] = BioToolbox.log2(data[j]);
             sum += chromosome[j];
             IntegralCN[j + 1] = sum;
         }

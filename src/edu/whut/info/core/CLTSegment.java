@@ -12,6 +12,7 @@ import java.util.logging.Logger;
  * Created by Liu on 2016/3/19.
  */
 public class CLTSegment implements SegmentCutter {
+    private final boolean Show_Debug = false;
     private double PVALUE_THRESH = 0.05;
     private int MIN_SEG_LENGTH = 256;
     private int MIN_SEG_STEP = 8;
@@ -33,7 +34,7 @@ public class CLTSegment implements SegmentCutter {
 
     @Override
     public void splitChromosome(double[] data, Set<Segment> result, short Chr_id) {
-        m_log.info(String.format("segment by %s", methodname));
+        //m_log.info(String.format("segment by %s", methodname));
         //chromosome=data;
         prepareCopyNumberSegment(data);
         Segment input = new Segment();
@@ -43,8 +44,9 @@ public class CLTSegment implements SegmentCutter {
         input.CopyNumber = arr[0];
         input.stdCopyNumber = arr[1];
         input.setRange(0, data.length);
-        splitChromosome(input, result);
-        m_log.info(String.format("#### #### #### chr %02d First Step: Loci Count = %05d; \t Segments Count = %d",
+        splitChromosome(data, input, result);
+        if (Show_Debug)
+            m_log.info(String.format("#### #### #### chr %02d First Step: Loci Count = %05d; \t Segments Count = %d",
                 Chr_id, data.length, result.size()));
     }
 
@@ -61,14 +63,15 @@ public class CLTSegment implements SegmentCutter {
         IntegralCN[0] = 0.0;
         double sum = 0;
         for (int j = 0; j < length; j++) {
-            chromosome[j] = data[j];
-            data[j] = BioToolbox.log2(data[j]);
-            sum += data[j];
+            //chromosome[j] = data[j];
+            //data[j] = BioToolbox.log2(data[j]);
+            chromosome[j] = BioToolbox.log2(data[j]);
+            sum += chromosome[j];
             IntegralCN[j + 1] = sum;
         }
     }
 
-    private void splitChromosome(Segment input, Set<Segment> output) {
+    private void splitChromosome(double[] data, Segment input, Set<Segment> output) {
 
         if (chromosome.length == 0) return;
         double[] arr = {input.CopyNumber, input.stdCopyNumber};
@@ -88,7 +91,7 @@ public class CLTSegment implements SegmentCutter {
             Segment curSeg = splittingSegments.poll();
             int segLength = curSeg.length();
 
-            refreshSegment(curSeg);
+            BioToolbox.refreshSegment(curSeg, chromosome);
 
             //?���̫��
             if (segLength <= 2 * MIN_SEG_LENGTH) {
@@ -161,11 +164,12 @@ public class CLTSegment implements SegmentCutter {
                 }
             }
         }
-        mergeSegment(output, 0.3);
+        mergeSegment(output, 0.05);
         int i = 1;
         for (Segment seg : output) {
-            refreshSegment(seg);
-            m_log.info(seg.getCharacterString());
+            //refreshSegment(seg);
+            BioToolbox.refreshSegment(seg, data);
+            if (Show_Debug) m_log.info(seg.getCharacterString());
             //  m_log.info(String.format("the %2d segment:\t start=%6d\t start=%6d\t mean=%.4f\t std=%.4f", i, seg.range.Start,seg.range.End,seg.HalfCopyNumber,seg.stdHalfCopyNumber));
             i++;
         }
@@ -178,8 +182,10 @@ public class CLTSegment implements SegmentCutter {
         Segment preSegment = it.next();
         while (it.hasNext()) {
             Segment nextSegment = it.next();
-            refreshSegment(preSegment);
-            refreshSegment(nextSegment);
+            //refreshSegment(preSegment);
+            //refreshSegment(nextSegment);
+            BioToolbox.refreshSegment(preSegment, chromosome);
+            BioToolbox.refreshSegment(nextSegment, chromosome);
             if (Math.abs(preSegment.CopyNumber - nextSegment.CopyNumber) <= threshold || preSegment.length() < 20 || nextSegment.length() < 20) {
                 preSegment.setRange(preSegment.Start(), nextSegment.End());
             } else {
@@ -208,16 +214,16 @@ public class CLTSegment implements SegmentCutter {
         return Math.abs((sum - len * cn) / (std * Math.sqrt(len)));
     }
 
-    public void refreshSegment(Segment seg) {
-        if (seg.isDirty) {
-            double[] ms;
-            ms = BioToolbox.robustMean(chromosome, seg.Start(), seg.End(), 16);
-            seg.CopyNumber = ms[0];
-            seg.stdCopyNumber = ms[1];
-
-            seg.isDirty = false;
-        }
-    }
+//    public void refreshSegment(Segment seg) {
+//        if (seg.isDirty) {
+//            double[] ms;
+//            ms = BioToolbox.robustMean(chromosome, seg.Start(), seg.End(), 16);
+//            seg.CopyNumber = ms[0];
+//            seg.stdCopyNumber = ms[1];
+//
+//            seg.isDirty = false;
+//        }
+//    }
 
     private double calculateZ1(Segment seg, int start, int stop, double[] arr) {
 

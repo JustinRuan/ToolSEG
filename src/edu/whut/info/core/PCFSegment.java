@@ -13,6 +13,7 @@ import java.util.logging.Logger;
  * Created by Liu on 2016/3/21.
  */
 public class PCFSegment implements SegmentCutter {
+    private final boolean Show_Debug = false;
     private String methodName = "PCFSegment";
     private double penaltyR;
     private int MIN_SEG_LENGTH = 256;
@@ -26,7 +27,7 @@ public class PCFSegment implements SegmentCutter {
 
     @Override
     public void splitChromosome(double[] data, Set<Segment> result, short chrId) {
-        m_log.info(String.format("Segment by%s: ", methodName));
+        //m_log.info(String.format("Segment by%s: ", methodName));
         Segment input = new Segment();
         input.setChr_id(chrId);
         input.Seg_id = 0;
@@ -74,7 +75,7 @@ public class PCFSegment implements SegmentCutter {
         int i = 1;
         for (Segment seg : result) {
             BioToolbox.refreshSegment(seg, data);
-            m_log.info(seg.getCharacterString());
+            if (Show_Debug) m_log.info(seg.getCharacterString());
             // m_log.info(String.format("the %2d segment:\t start=%6d\t end=%6d\t mean=%.4f\t std=%.4f", i, seg.range.Start,seg.range.End,seg.HalfCopyNumber,seg.stdHalfCopyNumber));
             i++;
         }

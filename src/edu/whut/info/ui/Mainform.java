@@ -90,7 +90,7 @@ public class Mainform {
     private JTextField txtbctlamda;
     private JButton showReultButton;
     private JLabel cltLengtxt;
-    private JPanel BCLT;
+    private JPanel DBS;
     private JTextField BCLTLengtxt;
     private JTextField BCLTpvaluetxt;
     private JTextField outliertxt;
@@ -99,7 +99,10 @@ public class Mainform {
     private JRadioButton power2RadioButton;
     private JTextField BCLTLambdatxt;
     private JCheckBox chkIsMultiFiles;
-    private JTextField DBSLimittxt;
+    private JButton btnClear;
+    private JButton btnLoad;
+    private JButton BtnCount;
+    private JLabel LblInfo;
     private Logger m_log;
 
     private int transformMethod;
@@ -112,10 +115,10 @@ public class Mainform {
         String path = String.format(".%sResult", File.separator);
         BioLogger log = new BioLogger(path, filename);
         m_log = Logger.getLogger("segment");
-        m_frame = new JFrame("ToolSEG 1.1");
-        cltsteptxt.setText("8");
+        m_frame = new JFrame("ToolSEG 1.2");
+        cltsteptxt.setText("4");
         cltlengthtxt.setText("256");
-        cbsLengthtxt.setText("256");
+        cbsLengthtxt.setText("100");
         cbsStepText.setText("8");
         cltpvaluetxt.setText("0.05");
         m_frame.setContentPane(MainPanel);
@@ -205,32 +208,32 @@ public class Mainform {
             @Override
             public void actionPerformed(ActionEvent e) {
                 switch (segmentMethod) {
-                    case 0:
+                    case 4:
                         centerProb = Double.valueOf(center.getText());
                         cutterAlgorithm = new HMMSegment(centerProb);
                         break;
-                    case 1:
+                    case 2:
                         penaltyR = Double.valueOf(gama.getText());
                         cutterAlgorithm = new FastPCF(200, 0.8, penaltyR);
                         break;
-                    case 2:
+                    case 3:
                         int length = Integer.valueOf(cltlengthtxt.getText());
                         int step = Integer.valueOf(cltsteptxt.getText());
                         double p = Double.valueOf(cltpvaluetxt.getText());
                         cutterAlgorithm = new CLTSegment(p, length, step);
                         break;
-                    case 3:
+                    case 5:
                         double lamda = Double.valueOf(lamdatxt.getText());
                         double tol = Double.valueOf(tolerancetxt.getText());
                         int maxIter = Integer.valueOf(maxItertxt.getText());
                         cutterAlgorithm = new LassoSegment(lamda, tol, maxIter);
                         break;
-                    case 4:
+                    case 0:
                         int cbslength = Integer.valueOf(cbsLengthtxt.getText());
                         int cbsstep = Integer.valueOf(cbsStepText.getText());
                         cutterAlgorithm = new CBSSegment(cbslength, cbsstep);
                         break;
-                    case 5:
+                    case 1:
                         gamap = Double.valueOf(pgamatxt.getText());
                         cutterAlgorithm = new PCFSegment(gamap);
                         break;
@@ -253,21 +256,21 @@ public class Mainform {
                         myCore.CnSegment.splitChromosome(chros, ratio, transformMethod, chkIsTestdata.isSelected());
                         break;
                     case 1:
-                        try {
-                            boolean flag = chkIsMultiFiles.isSelected();
-                            if (!flag) {
-                                ArrayList<Chromosome> tmpData = readCNtxt(filepath);
-                                chros.addAll(tmpData);
-                            } else {
-                                ArrayList<String> files = readFilePath(filepath);
-                                for (String path : files) {
-                                    ArrayList<Chromosome> tmpData = readCNtxt(path);
-                                    chros.addAll(tmpData);
-                                }
-                            }
-                        } catch (IOException e1) {
-                            e1.printStackTrace();
-                        }
+//                        try {
+//                            boolean flag = chkIsMultiFiles.isSelected();
+//                            if (!flag) {
+//                                ArrayList<Chromosome> tmpData = readCNtxt(filepath);
+//                                chros.addAll(tmpData);
+//                            } else {
+//                                ArrayList<String> files = readFilePath(filepath);
+//                                for (String path : files) {
+//                                    ArrayList<Chromosome> tmpData = readCNtxt(path);
+//                                    chros.addAll(tmpData);
+//                                }
+//                            }
+//                        } catch (IOException e1) {
+//                            e1.printStackTrace();
+//                        }
 
                         myCore.CnSegment.splitChromosome(chros, ratio, transformMethod, chkIsTestdata.isSelected());
                 }
@@ -444,6 +447,46 @@ public class Mainform {
             @Override
             public void actionPerformed(ActionEvent e) {
                 transformMethod = 2;
+            }
+        });
+        btnLoad.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    boolean flag = chkIsMultiFiles.isSelected();
+                    if (!flag) {
+                        ArrayList<Chromosome> tmpData = readCNtxt(filepath);
+                        chros.addAll(tmpData);
+                    } else {
+                        ArrayList<String> files = readFilePath(filepath);
+                        for (String path : files) {
+                            ArrayList<Chromosome> tmpData = readCNtxt(path);
+                            chros.addAll(tmpData);
+                        }
+                    }
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+                BtnCount.doClick();
+            }
+        });
+        btnClear.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                chros.clear();
+                BtnCount.doClick();
+            }
+        });
+        BtnCount.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int count = chros.size();
+                if (count > 1)
+                    LblInfo.setText(String.format("[%03d] Samples are loaded.", count));
+                else if (count == 1)
+                    LblInfo.setText(String.format("[%03d] Samples is loaded.", 1));
+                else
+                    LblInfo.setText(String.format("None Sample is loaded."));
             }
         });
     }
