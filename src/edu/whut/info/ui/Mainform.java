@@ -243,6 +243,10 @@ public class Mainform {
                         double lambda = Double.valueOf(BCLTLambdatxt.getText());
                         cutterAlgorithm = new DBS(p, length, lambda);
                         break;
+                    case 7:
+                        gamap = Double.valueOf(pgamatxt.getText());
+                        cutterAlgorithm = new PCFM(gamap);
+                        break;
                 }
 
                 double ratio = 0;
