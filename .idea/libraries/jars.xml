@@ -3,13 +3,9 @@
     <CLASSES>
       <root url="jar://$PROJECT_DIR$/jars/smile.jar!/" />
       <root url="jar://$PROJECT_DIR$/jars/jahmm-0.6.1.jar!/" />
-      <root url="jar://$PROJECT_DIR$/jars/commons-math3-3.3.jar!/" />
       <root url="jar://$PROJECT_DIR$/jars/javaml-0.1.7.jar!/" />
-      <root url="jar://$PROJECT_DIR$/jars/sqlite-jdbc-3.8.7.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES>
-      <root url="jar://$PROJECT_DIR$/jars/sqlite-jdbc-3.8.7.jar!/" />
-    </SOURCES>
+    <SOURCES />
   </library>
 </component>
