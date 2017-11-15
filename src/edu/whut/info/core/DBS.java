@@ -61,7 +61,7 @@ public class DBS implements SegmentCutter {
         Segment.resetID();
         Segment input = new Segment();
         input.setChr_id(Chr_id);
-        input.Seg_id = 1;//根节点
+        input.Seg_id = 1;//root node
 
         double[] arr = BioToolbox.mean_std(data);
         input.CopyNumber = arr[0];
@@ -186,13 +186,13 @@ public class DBS implements SegmentCutter {
         double z1, z2, z3;
 
         if (input.length() < MIN_SEG_LENGTH) {
-            //分段完成
+            //Segmentation completed
             input.isReady = true;
             output.add(input);
 
-            //并没有实际意义的计算，只是为了输出一个Z值
+            // There is no practical calculation, just to output a Z value
             for (int j = input.Start() + 1; j < input.End() - 1; j++) {
-                //如果过于接近整个段,就忽略
+                //If too close to the entire segment, it will be ignored
 
                 z1 = calculateZ(input, input.Start(), j);
                 z2 = calculateZ(input, j, input.End());
@@ -204,7 +204,7 @@ public class DBS implements SegmentCutter {
                     maxZsearch = z3;
                 }
             }
-            //没有意义的代码结束了！！！
+            //The meaningless code is over! ! !
 
             zTree.setZValue(parent, maxZ);
             zTree.setBreakPosition(parent, -1, 'C');
@@ -213,7 +213,7 @@ public class DBS implements SegmentCutter {
 
         for (int j = input.Start() + 20; j < input.End() - 20; j++) {
         //for (int j = input.Start() + MIN_SEG_LENGTH; j < input.End() - MIN_SEG_LENGTH; j++) {
-            //如果过于接近整个段,就忽略
+            //If too close to the entire segment, it will be ignored
 
             z1 = calculateZ(input, input.Start(), j);
             z2 = calculateZ(input, j, input.End());
@@ -232,7 +232,7 @@ public class DBS implements SegmentCutter {
         if (maxZ < robustSTD) {
             windowModel = 'W';
 
-            //可以开启，辅助加窗二分
+            //start the second phase, do dichotomy with window
             List<Integer> winSet = new LinkedList<>();
             int w = input.length() >> 1;
             while (w > 10 * MIN_SEG_LENGTH) {
@@ -244,7 +244,7 @@ public class DBS implements SegmentCutter {
             for (int width : winSet) {
                 //for (int j = input.Start() + 1; j < input.End() - 1; j++) {
                 for (int j = input.Start() + MIN_SEG_LENGTH; j < input.End() - MIN_SEG_LENGTH; j++) {
-                    //如果过于接近整个段,就忽略
+                    //If too close to the entire segment, it will be ignored
                     int left = Math.max(input.Start(), j - width);
                     int right = Math.min(input.End(), j + width);
                     z1 = calculateZ(input, left, j);
@@ -278,7 +278,7 @@ public class DBS implements SegmentCutter {
 
 
             int newBreak = maxPos;
-            //二分
+            //dichotomy
             Segment front = input.getSubSegment(input.Start(), newBreak);
             LinkedBinaryTreeNode<Integer> left = zTree.setLeft(parent, front);
             splitChromosome(left, front, output, maxZ);
@@ -288,7 +288,7 @@ public class DBS implements SegmentCutter {
             splitChromosome(right, behind, output, maxZ);
 
         } else {
-            //分段完成
+            //Segmentation completed
             input.isReady = true;
             output.add(input);
 
@@ -508,8 +508,8 @@ public class DBS implements SegmentCutter {
                     double std = segments.get(node.getData()).stdCopyNumber;
 
                     if (node.getLeft() != null && node.getRight() != null) {
-                        result[0] = (z < result[0]) ? z : result[0];//非叶子节点
-                    } else {//叶子节点
+                        result[0] = (z < result[0]) ? z : result[0];//Child node
+                    } else {//leaf node
                         result[1] = (std > result[1]) ? std : result[1];
                     }
                 }

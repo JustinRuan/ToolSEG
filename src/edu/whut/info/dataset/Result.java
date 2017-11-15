@@ -5,8 +5,8 @@ package edu.whut.info.dataset;
  */
 public class Result {
     public int id;
-    public int pos; //断点位置
-    public int[] range;//非断点区域
+    public int pos; //location of breakpoint
+    public int[] range;// continuous area
     public boolean isBreakPoint;
     public double value1;
 }

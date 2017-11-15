@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/ToolSEG.iml" filepath="$PROJECT_DIR$/ToolSEG.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ToolSeg.iml" filepath="$PROJECT_DIR$/ToolSeg.iml" />
     </modules>
   </component>
 </project>

@@ -310,7 +310,7 @@ public class HMMSegment implements SegmentCutter {
         double[] pi = new double[K];
         double[][] A = new double[K][K];
         double m_pi = 1.0 / K;
-        double diagRatio = centerProb; //�Խ����ϵ�Ԫ����ǶԽ�����Ԫ�ص�Ȩ�ر���8:1
+        double diagRatio = centerProb; //Probability on the diagonal
         double mb = 1.0 / (diagRatio + K - 1);
         double ma = diagRatio * mb;
         for (int i = 0; i < K; i++) {

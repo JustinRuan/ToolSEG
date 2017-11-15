@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
  *
  * @author Justin
  * @version 1.0
- * @created 08 -11月-2014 10:18:54
+ * @created 08 -11 -2014 10:18:54
  */
 public class ConfigObject {
 

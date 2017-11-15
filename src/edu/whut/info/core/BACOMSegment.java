@@ -52,7 +52,7 @@ public class BACOMSegment implements SegmentCutter {
         splitChromosome(data, input, result);
         if (Show_Debug)
             m_log.info(String.format("#### #### #### chr %02d First Step: Loci Count = %05d; \t Segments Count = %d",
-                Chr_id, data.length, result.size()));
+                    Chr_id, data.length, result.size()));
     }
 
     @Override
@@ -98,7 +98,7 @@ public class BACOMSegment implements SegmentCutter {
 
             BioToolbox.refreshSegment(curSeg, chromosome);
 
-            //?���̫��
+            // less than the minimum length
             if (segLength <= 2 * MIN_SEG_LENGTH) {
                 scrapSegments.add(curSeg);
             } else {
@@ -117,8 +117,6 @@ public class BACOMSegment implements SegmentCutter {
                 //int offset = 1;
                 for (int i = 0; i < indexLength - offset; i++) {
                     for (int j = i + offset; j < indexLength - offset; j++) {
-                        //������ڽӽ�������
-                        //if ((i<MIN_SEG_LENGTH/MIN_SEG_STEP) || (j>indexLength - MIN_SEG_LENGTH/MIN_SEG_STEP))
                         if ((Index.get(j) - Index.get(i) + 1) >= segLength - MIN_SEG_LENGTH)
                             continue;
 
@@ -236,7 +234,7 @@ public class BACOMSegment implements SegmentCutter {
 
         double sum = 0;
 
-        //��ͷ�Χ��Start��Stop - 1��������Stop
+        //只计算从Start到Stop - 1，并不包括Stop
         sum = IntegralCN[stop] - IntegralCN[start];
 
         ///return Math.abs((sum - len*avgHalfCopyNumber)/(stdHalfCopyNumber*Math.sqrt(len)))

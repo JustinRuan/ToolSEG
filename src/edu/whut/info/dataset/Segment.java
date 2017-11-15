@@ -8,7 +8,7 @@ import java.io.Serializable;
 /**
  * @author Justin
  * @version 2.0
- * @created 12-03月-2016 11:58:21
+ * @created 12-03-2016 11:58:21
  */
 public class Segment implements Comparable<Segment>, Serializable {
     private static final long serialVersionUID = 4905497107751450036L;
@@ -70,7 +70,7 @@ public class Segment implements Comparable<Segment>, Serializable {
     }
 
     public Segment getSubSegment(int start, int stop) {
-        if (start == stop) {//调试用
+        if (start == stop) {// for debug
             System.out.println("getSubSegment : Start == Stop!");
             System.exit(-1);
         }
@@ -87,10 +87,7 @@ public class Segment implements Comparable<Segment>, Serializable {
     }
 
     public final boolean isIncluded(int pos) {
-        if (pos >= range.Start && pos < range.End) {
-            return true;
-        } else
-            return false;
+        return pos >= range.Start && pos < range.End;
     }
 
 }
