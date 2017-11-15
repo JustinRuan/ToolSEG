@@ -11,7 +11,7 @@ import java.util.logging.Logger;
  * Created by Liu on 2016/3/21.
  */
 public class CBSSegment implements SegmentCutter {
-    private final boolean Show_Debug = false;
+    private boolean Show_Debug = true;
     private int MIN_SEG_LENGTH;
     private int MIN_SEG_STEP = 2;
     private String name = "CBSegmentCutter";
@@ -25,6 +25,11 @@ public class CBSSegment implements SegmentCutter {
         this.MIN_SEG_STEP = MIN_SEG_STEP;
         m_log = Logger.getLogger("segment");
         results=new LinkedList<>();
+    }
+
+    @Override
+    public void enableShowDebug(boolean value) {
+        Show_Debug = value;
     }
 
     @Override
@@ -42,7 +47,7 @@ public class CBSSegment implements SegmentCutter {
         Queue<Segment> splittingSegments = new LinkedList<Segment>();
         //splittingSegments.add(input);
         int totLength = data.length;//
-        final int L = 100000;//2000
+        final int L = 2000;//100000;//2000
         int K = totLength / L;
         int temp = 0;
         ArrayList<Long> potentials = new ArrayList<>();
@@ -118,21 +123,6 @@ public class CBSSegment implements SegmentCutter {
             // m_log.info(String.format("the %2d segment:\t start=%6d\t end=%6d\t mean=%.4f\t std=%.4f", i, seg.range.Start,seg.range.End,seg.HalfCopyNumber,seg.stdHalfCopyNumber));
             i++;
         }
-//        for (Segment seg:result){
-//            Result rs=new Result();
-//            rs.range=new int[]{seg.Start(),seg.End()};
-//            rs.isBreakPoint=false;
-//           // rs.value1=BioToolbox.mean(VectorE.subList(seg.Start(),seg.End()));
-//            results.add(rs);
-//            Result rs1=new Result();
-//            rs1.range=null;
-//            rs1.isBreakPoint=true;
-//            rs1.pos=seg.End();
-//          //  rs1.value1=VectorE.get(seg.End());
-//            results.add(rs1);
-//        }
-//        results.remove(results.size()-1);
-
     }
 
     private void mergeSegment(Set<Segment> output, double threshold) {

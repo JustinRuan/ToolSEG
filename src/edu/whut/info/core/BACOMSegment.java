@@ -11,8 +11,8 @@ import java.util.logging.Logger;
 /**
  * Created by Liu on 2016/3/19.
  */
-public class CLTSegment implements SegmentCutter {
-    private final boolean Show_Debug = false;
+public class BACOMSegment implements SegmentCutter {
+    private boolean Show_Debug = true;
     private double PVALUE_THRESH = 0.05;
     private int MIN_SEG_LENGTH = 256;
     private int MIN_SEG_STEP = 8;
@@ -21,15 +21,20 @@ public class CLTSegment implements SegmentCutter {
     private double[] IntegralCN;
     private double[] chromosome;
     private List<Double> robustSTD;
-    private String methodname = "CLTSegment";
+    private String methodname = "BACOMSegment";
 
-    public CLTSegment(double pvalueThre, int minSegLen, int minStep) {
+    public BACOMSegment(double pvalueThre, int minSegLen, int minStep) {
         m_log = Logger.getLogger("segment");
         this.PVALUE_THRESH = pvalueThre;
         this.MIN_SEG_LENGTH = minSegLen;
         this.MIN_SEG_STEP = minStep;
         // this.COMBINE_FACTOR = combinefactor;
         this.robustSTD = new ArrayList<>();
+    }
+
+    @Override
+    public void enableShowDebug(boolean value) {
+        Show_Debug = value;
     }
 
     @Override

@@ -13,7 +13,7 @@ import java.util.logging.Logger;
  * Created by Liu on 2016/3/21.
  */
 public class PCFM implements SegmentCutter {
-    private final boolean Show_Debug = false;
+    private boolean Show_Debug = false;
     private String methodName = "PCF";
     private double penaltyR;
     private int MIN_SEG_LENGTH = 256;
@@ -26,7 +26,11 @@ public class PCFM implements SegmentCutter {
     }
 
     @Override
+    public void enableShowDebug(boolean value) {
+        Show_Debug = value;
+    }
 
+    @Override
     public void splitChromosome(double[] data, Set<Segment> result, short chrId) {
         //m_log.info(String.format("Segment by%s: ", methodName));
         Segment input = new Segment();

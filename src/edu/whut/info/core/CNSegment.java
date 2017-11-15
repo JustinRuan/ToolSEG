@@ -95,6 +95,7 @@ public class CNSegment {
     }
     public void splitChromosome(ArrayList<Chromosome> chros, double ratio, int method, boolean isTest) {
         result.clear();
+        cutter.enableShowDebug(!isTest);
 //        //100个点中取一个
 //        for (Chromosome chr : chros){
 //            chr.sampling();
@@ -111,7 +112,7 @@ public class CNSegment {
             chrIds.add(chros.get(i).chrId);
 
         ResultAnalysis RA = new ResultAnalysis();
-
+        long total_time = 0;
         for (int i = 0; i < nums; i++) {
             long t1 = 0, t2 = 0;
             if (!isTest) {
@@ -123,6 +124,7 @@ public class CNSegment {
             t2 = System.currentTimeMillis();
 
             long tt = t2 - t1;
+            total_time += tt;
             m_log.info(String.format("%s: the %4d chro is split: \t< Length,Time(ms)> = \t%d \t%d",
                     cutter.getMethodName(), i + 1, cacheSample.get(i).length, tt));
 
@@ -133,6 +135,7 @@ public class CNSegment {
                 RA.addResult(result.get(i));
             }
         }
+        m_log.info(String.format("Total time = %d(ms)", total_time));
         //计算ROC曲线
         if (isTest){
             RA.prepareTest();
@@ -143,7 +146,7 @@ public class CNSegment {
 
         if (!isTest) {
             //画出分段结果
-            drawProbeSets(chros, result, method);
+//            drawProbeSets(chros, result, method);
         }
         //只分一段
         //    cutter.splitChromosome(cacheSample.get(1),result.get(1),chrIds.get(1));

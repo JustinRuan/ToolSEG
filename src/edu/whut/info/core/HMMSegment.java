@@ -25,6 +25,7 @@ import java.util.logging.Logger;
  * Created by Liu on 2016/3/20.
  */
 public class HMMSegment implements SegmentCutter {
+    private boolean Show_Debug = false;
     private String methodName = "HMMSegment";
     private Logger m_log;
     private double centerProb;
@@ -45,6 +46,11 @@ public class HMMSegment implements SegmentCutter {
         }
         double mean = sum / len;
         return new double[]{mean, Math.sqrt(sumSquare / len - mean * mean)};
+    }
+
+    @Override
+    public void enableShowDebug(boolean value) {
+        Show_Debug = value;
     }
 
     @Override

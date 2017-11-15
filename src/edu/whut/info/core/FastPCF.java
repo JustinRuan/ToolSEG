@@ -11,7 +11,7 @@ import java.util.logging.Logger;
  * Created by Liu on 2016/3/21.
  */
 public class FastPCF implements SegmentCutter {
-    private final boolean Show_Debug = false;
+    private boolean Show_Debug = false;
     private int winK;
     private double penaltyR;
     private Logger m_log;
@@ -29,6 +29,11 @@ public class FastPCF implements SegmentCutter {
 
     public void setPenaltyR(double penaltyR) {
         this.penaltyR = penaltyR;
+    }
+
+    @Override
+    public void enableShowDebug(boolean value) {
+        Show_Debug = value;
     }
 
     @Override

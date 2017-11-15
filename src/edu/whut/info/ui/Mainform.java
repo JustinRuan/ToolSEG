@@ -220,7 +220,7 @@ public class Mainform {
                         int length = Integer.valueOf(cltlengthtxt.getText());
                         int step = Integer.valueOf(cltsteptxt.getText());
                         double p = Double.valueOf(cltpvaluetxt.getText());
-                        cutterAlgorithm = new CLTSegment(p, length, step);
+                        cutterAlgorithm = new BACOMSegment(p, length, step);
                         break;
                     case 5:
                         double lamda = Double.valueOf(lamdatxt.getText());
@@ -320,7 +320,7 @@ public class Mainform {
                 int minStep = Integer.valueOf(cltsteptxt.getText());
                 double pvalue = Double.valueOf(cltpvaluetxt.getText());
                 // double bcltlamda=Double.valueOf(txtbctlamda.getText());
-                cutterAlgorithm = new CLTSegment(pvalue, minlength, minStep);
+                cutterAlgorithm = new BACOMSegment(pvalue, minlength, minStep);
                 cutters.add(cutterAlgorithm);
                 double lamda = Double.valueOf(lamdatxt.getText());
                 double tol = Double.valueOf(tolerancetxt.getText());
@@ -460,6 +460,7 @@ public class Mainform {
                     boolean flag = chkIsMultiFiles.isSelected();
                     if (!flag) {
                         ArrayList<Chromosome> tmpData = readCNtxt(filepath);
+//                        System.out.println("Loaded " + filepath);
                         chros.addAll(tmpData);
                     } else {
                         ArrayList<String> files = readFilePath(filepath);

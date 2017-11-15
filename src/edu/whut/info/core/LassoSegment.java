@@ -12,6 +12,7 @@ import java.util.logging.Logger;
  * Created by Liu on 2016/3/21.
  */
 public class LassoSegment implements SegmentCutter {
+    private boolean Show_Debug = false;
     private String methodName = "LassoSegment";
     private Logger m_log;
     private double lamda;
@@ -24,6 +25,11 @@ public class LassoSegment implements SegmentCutter {
         this.tol = tol;
         this.maxIter = maxIter;
         m_log = Logger.getLogger("segment");
+    }
+
+    @Override
+    public void enableShowDebug(boolean value) {
+        Show_Debug = value;
     }
 
     @Override

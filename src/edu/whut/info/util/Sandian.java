@@ -8,16 +8,16 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.FastScatterPlot;
-import org.jfree.ui.ApplicationFrame;
 import org.jfree.ui.RefineryUtilities;
 
+import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
 /**
  * A demo of the fast scatter plot.
  */
-public class Sandian extends ApplicationFrame {
+public class Sandian extends JFrame {
 
     /**
      * A constant for the number of items in the sample dataset.
@@ -64,7 +64,6 @@ public class Sandian extends ApplicationFrame {
         panel.setMaximumDrawWidth(2000);
 
         setContentPane(panel);
-
     }
 
     /**

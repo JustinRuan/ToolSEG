@@ -18,7 +18,7 @@ import java.util.logging.Logger;
  */
 //Central limit theorem
 public class DBS implements SegmentCutter {
-    private final boolean Show_Debug = true;
+    private boolean Show_Debug = true;
     private double PVALUE_THRESH = 0.05;
     private int MIN_SEG_LENGTH = 200;
     private double LAMBDA = 0.1;
@@ -44,6 +44,11 @@ public class DBS implements SegmentCutter {
 
     public String getMethodname() {
         return methodname;
+    }
+
+    @Override
+    public void enableShowDebug(boolean value) {
+        Show_Debug = value;
     }
 
     @Override

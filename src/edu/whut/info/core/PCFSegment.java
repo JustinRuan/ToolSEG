@@ -13,7 +13,7 @@ import java.util.logging.Logger;
  * Created by Liu on 2016/3/21.
  */
 public class PCFSegment implements SegmentCutter {
-    private final boolean Show_Debug = false;
+    private boolean Show_Debug = false;
     private String methodName = "PCFSegment";
     private double penaltyR;
     private int MIN_SEG_LENGTH = 256;
@@ -23,6 +23,11 @@ public class PCFSegment implements SegmentCutter {
     public PCFSegment(double penaltyR) {
         this.penaltyR = penaltyR;
         m_log = Logger.getLogger("segment");
+    }
+
+    @Override
+    public void enableShowDebug(boolean value) {
+        Show_Debug = value;
     }
 
     @Override
