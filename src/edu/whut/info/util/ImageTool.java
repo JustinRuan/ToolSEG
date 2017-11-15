@@ -13,12 +13,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
- * * @author WQ * @date 2011-01-14 * @versions 1.0 Í¼Æ¬Ñ¹Ëõ¹¤¾ßÀà Ìá¹©µÄ·½·¨ÖĞ¿ÉÒÔÉè¶¨Éú³ÉµÄ
- * ËõÂÔÍ¼Æ¬µÄ´óĞ¡³ß´çµÈ
+ * * @author WQ * @date 2011-01-14 * @versions 1.0 å›¾ç‰‡å‹ç¼©å·¥å…·ç±» æä¾›çš„æ–¹æ³•ä¸­å¯ä»¥è®¾å®šç”Ÿæˆçš„
+ * ç¼©ç•¥å›¾ç‰‡çš„å¤§å°å°ºå¯¸ç­‰
  */
 public class ImageTool {
     /**
-     * Í¼Æ¬ÎÄ¼ş¶ÁÈ¡ * * @param srcImgPath * @return
+     * å›¾ç‰‡æ–‡ä»¶è¯»å– * * @param srcImgPath * @return
      */
     public static BufferedImage InputImage(String srcImgPath) {
         BufferedImage srcImage = null;
@@ -26,15 +26,15 @@ public class ImageTool {
             FileInputStream in = new FileInputStream(srcImgPath);
             srcImage = ImageIO.read(in);
         } catch (IOException e) {
-            System.out.println("¶ÁÈ¡Í¼Æ¬ÎÄ¼ş³ö´í£¡" + e.getMessage());
+            System.out.println("è¯»å–å›¾ç‰‡æ–‡ä»¶å‡ºé”™ï¼" + e.getMessage());
             e.printStackTrace();
         }
         return srcImage;
     }
 
     /**
-     * * ½«Í¼Æ¬°´ÕÕÖ¸¶¨µÄÍ¼Æ¬³ß´çÑ¹Ëõ * * @param srcImgPath :Ô´Í¼Æ¬Â·¾¶ * @param outImgPath *
-     * :Êä³öµÄÑ¹ËõÍ¼Æ¬µÄÂ·¾¶ * @param new_w * :Ñ¹ËõºóµÄÍ¼Æ¬¿í * @param new_h * :Ñ¹ËõºóµÄÍ¼Æ¬¸ß
+     * * å°†å›¾ç‰‡æŒ‰ç…§æŒ‡å®šçš„å›¾ç‰‡å°ºå¯¸å‹ç¼© * * @param srcImgPath :æºå›¾ç‰‡è·¯å¾„ * @param outImgPath *
+     * :è¾“å‡ºçš„å‹ç¼©å›¾ç‰‡çš„è·¯å¾„ * @param new_w * :å‹ç¼©åçš„å›¾ç‰‡å®½ * @param new_h * :å‹ç¼©åçš„å›¾ç‰‡é«˜
      */
     public static void compressImage(String srcImgPath, String outImgPath,
                                      int new_w, int new_h) {
@@ -43,25 +43,25 @@ public class ImageTool {
     }
 
     /**
-     * * Ö¸¶¨³¤»òÕß¿íµÄ×î´óÖµÀ´Ñ¹ËõÍ¼Æ¬ * * @param srcImgPath * :Ô´Í¼Æ¬Â·¾¶ * @param outImgPath *
-     * :Êä³öµÄÑ¹ËõÍ¼Æ¬µÄÂ·¾¶ * @param maxLength * :³¤»òÕß¿íµÄ×î´óÖµ
+     * * æŒ‡å®šé•¿æˆ–è€…å®½çš„æœ€å¤§å€¼æ¥å‹ç¼©å›¾ç‰‡ * * @param srcImgPath * :æºå›¾ç‰‡è·¯å¾„ * @param outImgPath *
+     * :è¾“å‡ºçš„å‹ç¼©å›¾ç‰‡çš„è·¯å¾„ * @param maxLength * :é•¿æˆ–è€…å®½çš„æœ€å¤§å€¼
      */
     public static void compressImage(String srcImgPath, String outImgPath,
                                      int maxLength) {
-        // µÃµ½Í¼Æ¬
+        // å¾—åˆ°å›¾ç‰‡
         BufferedImage src = InputImage(srcImgPath);
         if (null != src) {
             int old_w = src.getWidth();
-            // µÃµ½Ô´Í¼¿í
+            // å¾—åˆ°æºå›¾å®½
             int old_h = src.getHeight();
-            // µÃµ½Ô´Í¼³¤
+            // å¾—åˆ°æºå›¾é•¿
             int new_w = 0;
-            // ĞÂÍ¼µÄ¿í
+            // æ–°å›¾çš„å®½
             int new_h = 0;
-            // ĞÂÍ¼µÄ³¤
-            // ¸ù¾İÍ¼Æ¬³ß´çÑ¹Ëõ±ÈµÃµ½ĞÂÍ¼µÄ³ß´ç
+            // æ–°å›¾çš„é•¿
+            // æ ¹æ®å›¾ç‰‡å°ºå¯¸å‹ç¼©æ¯”å¾—åˆ°æ–°å›¾çš„å°ºå¯¸
             if (old_w > old_h) {
-                // Í¼Æ¬ÒªËõ·ÅµÄ±ÈÀı
+                // å›¾ç‰‡è¦ç¼©æ”¾çš„æ¯”ä¾‹
                 new_w = maxLength;
                 new_h = Math.round(old_h * ((float) maxLength / old_w));
             } else {
@@ -73,17 +73,17 @@ public class ImageTool {
     }
 
     /**
-     * ´¦ÀíÍ¼Æ¬ * * @param src * @param outImgPath * @param new_w * @param new_h
+     * å¤„ç†å›¾ç‰‡ * * @param src * @param outImgPath * @param new_w * @param new_h
      */
     private synchronized static void disposeImage(BufferedImage src,
                                                   String outImgPath, int new_w, int new_h) {
-        // µÃµ½Í¼Æ¬
+        // å¾—åˆ°å›¾ç‰‡
         int old_w = src.getWidth();
-        // µÃµ½Ô´Í¼¿í
+        // å¾—åˆ°æºå›¾å®½
         int old_h = src.getHeight();
-        // µÃµ½Ô´Í¼³¤
+        // å¾—åˆ°æºå›¾é•¿
         BufferedImage newImg = null;
-        // ÅĞ¶ÏÊäÈëÍ¼Æ¬µÄÀàĞÍ
+        // åˆ¤æ–­è¾“å…¥å›¾ç‰‡çš„ç±»å‹
         switch (src.getType()) {
             case 13:
                 // png,gifnewImg = new BufferedImage(new_w, new_h,
@@ -94,27 +94,27 @@ public class ImageTool {
                 break;
         }
         Graphics2D g = newImg.createGraphics();
-        // ´ÓÔ­Í¼ÉÏÈ¡ÑÕÉ«»æÖÆĞÂÍ¼
+        // ä»åŸå›¾ä¸Šå–é¢œè‰²ç»˜åˆ¶æ–°å›¾
         g.drawImage(src, 0, 0, old_w, old_h, null);
         g.dispose();
-        // ¸ù¾İÍ¼Æ¬³ß´çÑ¹Ëõ±ÈµÃµ½ĞÂÍ¼µÄ³ß´ç
+        // æ ¹æ®å›¾ç‰‡å°ºå¯¸å‹ç¼©æ¯”å¾—åˆ°æ–°å›¾çš„å°ºå¯¸
         newImg.getGraphics().drawImage(
                 src.getScaledInstance(new_w, new_h, Image.SCALE_SMOOTH), 0, 0,
                 null);
-        // µ÷ÓÃ·½·¨Êä³öÍ¼Æ¬ÎÄ¼ş
+        // è°ƒç”¨æ–¹æ³•è¾“å‡ºå›¾ç‰‡æ–‡ä»¶
         OutImage(outImgPath, newImg);
     }
 
     /**
-     * * ½«Í¼Æ¬ÎÄ¼şÊä³öµ½Ö¸¶¨µÄÂ·¾¶£¬²¢¿ÉÉè¶¨Ñ¹ËõÖÊÁ¿ * * @param outImgPath * @param newImg * @param
+     * * å°†å›¾ç‰‡æ–‡ä»¶è¾“å‡ºåˆ°æŒ‡å®šçš„è·¯å¾„ï¼Œå¹¶å¯è®¾å®šå‹ç¼©è´¨é‡ * * @param outImgPath * @param newImg * @param
      * per
      */
     private static void OutImage(String outImgPath, BufferedImage newImg) {
-        // ÅĞ¶ÏÊä³öµÄÎÄ¼ş¼ĞÂ·¾¶ÊÇ·ñ´æÔÚ£¬²»´æÔÚÔò´´½¨
+        // åˆ¤æ–­è¾“å‡ºçš„æ–‡ä»¶å¤¹è·¯å¾„æ˜¯å¦å­˜åœ¨ï¼Œä¸å­˜åœ¨åˆ™åˆ›å»º
         File file = new File(outImgPath);
         if (!file.getParentFile().exists()) {
             file.getParentFile().mkdirs();
-        }// Êä³öµ½ÎÄ¼şÁ÷
+        }// è¾“å‡ºåˆ°æ–‡ä»¶æµ
         try {
             ImageIO.write(newImg, outImgPath.substring(outImgPath
                     .lastIndexOf(".") + 1), new File(outImgPath));
