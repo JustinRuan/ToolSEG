@@ -73,11 +73,13 @@ and the output path, as shown in figure 7. They also can choose whether the
 input data is used to be tested. The input file should be .txt file like
 this way:
 
->   chrId Loci CNValue 1 0 1.123846
+>   chrId 	Loci		 CNValue 
+>
+>   1 		0 		1.123846
 
->   1 1 1.057979
+>   1		1 		1.057979
 
->   1 2 1.061475.....
+>   1		2 		1.061475.....
 
 chrId is the serial number of Chromosome. Loci is the position of copy
 number. CNValue is the copy number value.
@@ -177,3 +179,6 @@ Figure 18. Picture of all results
 
 ![](./media/image23.png)
 Figure 19.Picture of console
+
+### 3）Batch processing
+

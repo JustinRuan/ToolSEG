@@ -25,7 +25,7 @@ import java.util.logging.Logger;
  * Created by Liu on 2016/3/20.
  */
 public class HMMSegment implements SegmentCutter {
-    private boolean Show_Debug = false;
+    private boolean Show_Debug = true;
     private String methodName = "HMMSegment";
     private Logger m_log;
     private double centerProb;

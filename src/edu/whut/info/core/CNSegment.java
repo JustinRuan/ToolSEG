@@ -116,7 +116,9 @@ public class CNSegment {
         for (int i = 0; i < nums; i++) {
             long t1 = 0, t2 = 0;
             if (!isTest) {
+                m_log.info("processing the following data:");
                 printOriginalSegment(chros.get(i));
+                m_log.info("waiting for the segmentation results:");
             }
 
             t1 = System.currentTimeMillis();

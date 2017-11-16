@@ -433,6 +433,7 @@ public class Mainform {
             @Override
             public void actionPerformed(ActionEvent e) {
                 chros.clear();
+                nums = -1;
             }
         });
         bypassRadioButton.addActionListener(new ActionListener() {
