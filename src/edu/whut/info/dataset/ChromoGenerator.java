@@ -109,8 +109,8 @@ public class ChromoGenerator {
         for (int i = 1; i <= 4; i++)
             rawdata.put(i, new ArrayList<Double>());
         List<String> datas = new ArrayList<>();
-        datas.add("data\\sourcedata.db");
-        datas.add("data\\chro1.db");
+        datas.add(String.format(".%1$sdata%1$ssourcedata.db", File.separator));
+        datas.add(String.format(".%1$sdata%1$schro1.db", File.separator));
         for (String s : datas)
             merge(s, rawdata);
         int segNum = 0;

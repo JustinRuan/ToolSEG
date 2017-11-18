@@ -103,6 +103,7 @@ public class Mainform {
     private JButton btnLoad;
     private JButton BtnCount;
     private JLabel LblInfo;
+    private JPanel R_Package;
     private Logger m_log;
 
     private int transformMethod;
@@ -246,6 +247,9 @@ public class Mainform {
                     case 7:
                         gamap = Double.valueOf(pgamatxt.getText());
                         cutterAlgorithm = new PCFM(gamap);
+                        break;
+                    case 8:
+                        cutterAlgorithm = new Import_Results();
                         break;
                 }
 
@@ -514,7 +518,7 @@ public class Mainform {
                     index++;
                 }
                 StringBuffer sb = new StringBuffer();
-                sb.append("changepoint: ");
+                sb.append("# changepoint: ");
                 for (long lg : chro.changepoints)
                     sb.append(lg + "  ");
                 out.write(sb.toString() + "\r\n");
@@ -720,8 +724,8 @@ public class Mainform {
         chro.setChrId((short) chrId);
         ArrayList<Long> changePoints = new ArrayList<>();
         while ((s = in.readLine()) != null) {
-            if (s.substring(0, 12).equals("changepoint:")) {
-                s = s.substring(12);
+            if (s.substring(0, 14).equals("# changepoint:")) {
+                s = s.substring(14);
                 String[] arr = s.split("\\s+");
                 List<String> arrayList = Arrays.asList(arr);
                 //ArrayList<String> newarr=new ArrayList<>();

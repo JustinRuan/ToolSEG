@@ -180,7 +180,7 @@ public class ResultAnalysis {
 
         for (int k = 0; k < step; k++) {
             double Tolerance = 0.0001 + 0.0001 * k * k * k;
-
+//            double Tolerance = 0.001 + 0.001 * k * k * k;
             Iterator<Double> itTrue = goldStandard.iterator();
             Iterator<Double> itValue = testValues.iterator();
             while (itTrue.hasNext()) {

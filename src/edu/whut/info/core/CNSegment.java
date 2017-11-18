@@ -108,8 +108,9 @@ public class CNSegment {
         }
 
         ArrayList<Short> chrIds = new ArrayList<>();
-        for (int i = 0; i < nums; i++)
+        for (int i = 0; i < nums; i++) {
             chrIds.add(chros.get(i).chrId);
+        }
 
         ResultAnalysis RA = new ResultAnalysis();
         long total_time = 0;
@@ -123,12 +124,13 @@ public class CNSegment {
 
             t1 = System.currentTimeMillis();
             cutter.splitChromosome(cacheSample.get(i), result.get(i), chrIds.get(i));
+//            cutter.splitChromosome(cacheSample.get(i), result.get(i), (short) (i+1)); //Improt R results
             t2 = System.currentTimeMillis();
 
             long tt = t2 - t1;
             total_time += tt;
-            m_log.info(String.format("%s: the %4d chro is split: \t< Length,Time(ms)> = \t%d \t%d",
-                    cutter.getMethodName(), i + 1, cacheSample.get(i).length, tt));
+            m_log.info(String.format("%s: the %4d chro is split: \t< Length,Time(ms)> = \t%d \t%d, \t\t segment count = %d",
+                    cutter.getMethodName(), i + 1, cacheSample.get(i).length, tt, result.get(i).size()));
 
             if (isTest) {// Stores the data needed to calculate the ROC curve
                 List<Long> breakPoints = chros.get(i).changepoints;

@@ -163,7 +163,7 @@ public class DBS implements SegmentCutter {
 
             Arrays.parallelSort(df);
             final double limit = 0.01;
-            //final double limit = 0.5/2;
+//            final double limit = 0.001/2;
             double[] ap = Arrays.copyOfRange(df, (int) (limit * count), (int) ((1 - limit) * count));
             double[] temp = BioToolbox.mean_std(ap);
             double std = temp[1] / Math.sqrt(2.0);
@@ -237,6 +237,7 @@ public class DBS implements SegmentCutter {
             int w = input.length() >> 1;
             while (w > 10 * MIN_SEG_LENGTH) {
                 w = w >> 1;
+//                w = w/4;
                 winSet.add(w);
             }
 
