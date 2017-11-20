@@ -1,3 +1,16 @@
+//Copyright 2017 Jun Ruan
+//
+//        Licensed under the Apache License, Version 2.0 (the "License");
+//        you may not use this file except in compliance with the License.
+//        You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//        Unless required by applicable law or agreed to in writing, software
+//        distributed under the License is distributed on an "AS IS" BASIS,
+//        WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//        See the License for the specific language governing permissions and
+//        limitations under the License.
 package edu.whut.info.core;
 
 import com.google.common.primitives.Doubles;
@@ -68,6 +81,7 @@ public class CNSegment {
             cacheSample.add(cnArray);
         }
     }
+
     public void printOriginalSegment(Chromosome chro){
         Set<Segment> result=new TreeSet<>();
         List<Long> changepoints=chro.changepoints;
@@ -75,15 +89,15 @@ public class CNSegment {
         input.setChr_id(chro.chrId);
         input.setRange(0, chro.getLength());
         long start=0,end=0;
-        for(int i=0;i<changepoints.size();i++){
-             end=changepoints.get(i);
-             result.add(input.getSubSegment((int)start,(int)end));
+        for(int i=0; i<changepoints.size(); i++){
+            end=changepoints.get(i);
+            result.add(input.getSubSegment((int)start,(int)end));
             start=end;
         }
         result.add(input.getSubSegment((int)end,chro.getLength()));
         int i = 1;
         double[] data=new double[chro.getLength()];
-        for (int j=0;j<chro.getLength();j++)
+        for (int j=0; j<chro.getLength(); j++)
             data[j]=chro.probes.get(j);
         m_log.info("\n");
         for (Segment seg : result) {
@@ -93,6 +107,7 @@ public class CNSegment {
         }
         m_log.info("\n");
     }
+
     public void splitChromosome(ArrayList<Chromosome> chros, double ratio, int method, boolean isTest) {
         result.clear();
         cutter.enableShowDebug(!isTest);
