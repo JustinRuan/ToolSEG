@@ -97,6 +97,8 @@ number. CNValue is the copy number value.
 
 Figure 7.Input data
 
+
+
 ### 2)  Algorithms Module
 
 Another module is “Algorithms”, where user can choose the algorithm they
