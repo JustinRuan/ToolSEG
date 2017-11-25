@@ -22,15 +22,24 @@ recommended to install the JDK first.
 ![](media/Image1.png)
 Figure 1.Java SE download
 
-**Step 3:**  Download three Zip packages ToolSeg.zip, ToolSeg.z01, and test_data.zip at "ToolSeg/bin" from <https://gitee.com/w3STeam/ToolSeg>. Then unzip these files to a local folder.
+**Step 3:**  Download two Zip packages ToolSeg.zip and test_data.zip from <https://gitee.com/w3STeam/ToolSeg/attach_files>. Then unzip these files to a local folder.
 
-**Step 4:** Now, enter the folder and click the "start.bat " to run the program, as is shown in
-Figure 2.
+**Step 4:** Now, enter the folder and click the "start.bat " to run the program in Windows, as is shown in
+Figure 2. (or run command “java -jar ToolSeg.jar” in Linux.)
 
 ![](media/Image2.png)
 
 Figure 2.Run the project
 
+**Step 5:**
+Fast run. 
+
+1. select an input path
+2. load data
+3. select an aogorithm
+4. segment
+
+![](media/fast-run.png)
 ## 4. Usage 
 
 ![](media/Image3.png)
@@ -182,3 +191,15 @@ Figure 19.Picture of console
 
 ### 3）Batch processing
 
+When selecting the data input by users, users can choose whether to batch process, as shown in figure 24. When users choose to batch process, the input file should be .txt file and the content should be like this way:
+>   .\data\testdata2\LTestdata_20161026_151708.txt
+>
+>   .\data\testdata2\LTestdata_20161026_152635.txt
+
+>   .\data\testdata2\R_Testdata_20161026_151627.txt
+
+>   .\data\testdata2\R_Testdata_20161026_153220.txt
+
+Here, each .txt file must be one of the above input files.
+![](./media/image24.png)
+Figure 20.Picture of batch processing

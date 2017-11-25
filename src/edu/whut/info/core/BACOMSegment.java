@@ -180,7 +180,7 @@ public class BACOMSegment implements SegmentCutter {
                 }
             }
         }
-        mergeSegment(output, 0.05);
+        mergeSegment(output, 0.02);
         int i = 1;
         for (Segment seg : output) {
             //refreshSegment(seg);

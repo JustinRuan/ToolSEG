@@ -202,7 +202,7 @@ public class ResultAnalysis {
                 trueValue = itTrue.next();
                 testValue = itValue.next();
 
-                boolean trueTag = (Math.abs(trueValue - 2) < 0.05);
+                boolean trueTag = (Math.abs(trueValue - 2) < 0.02);
                 boolean testTag = (Math.abs(testValue - 2) < Tolerance);
 
                 if (trueTag) {
@@ -232,13 +232,22 @@ public class ResultAnalysis {
         StringBuilder result = new StringBuilder();
         for (Set<Segment> setSeg : correctSegs){
             count += setSeg.size();
-            for (Segment seg :setSeg){
-                result.append(String.format("\t%.4f\t%.4f\t%d\n",seg.CopyNumber,seg.stdCopyNumber,seg.length()));
-            }
+//            for (Segment seg :setSeg){
+//                result.append(String.format("\t%.4f\t%.4f\t%d\n",seg.CopyNumber,seg.stdCopyNumber,seg.length()));
+//            }
         }
 
         m_log.info(String.format("\n. Segment count = %d \n ",count));
         m_log.info("\n" + result.toString());
+
+        count = 0;
+        for (Set<Segment> setSeg : results) {
+            count += setSeg.size();
+//            for (Segment seg :setSeg){
+//                result.append(String.format("\t%.4f\t%.4f\t%d\n",seg.CopyNumber,seg.stdCopyNumber,seg.length()));
+//            }
+        }
+        m_log.info(String.format("\n. Segment count of result = %d \n ", count));
 
     }
 }
